@@ -84,13 +84,17 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-bool isPrime(ll n) {
-    if(n == 2 || n == 3) return 1;
-    if(n < 5 || n % 2 == 0 || n % 3 == 0) return 0;
-    for(int p = 5; p <= sqrt(n); p += 6) {
-        if(n % p == 0 || n % (p + 2) == 0) return 0;
+vector<ll> primes;
+bitset isPrime = bitset<1000001>().set();
+const int limN = 1e6 + 5;
+void sieve() {
+    for(int i = 2; i <= sqrt(limN); i++) {
+        if(isPrime[i]) {
+            for(int j = i * i; j <= limN; j += i) {
+                isPrime[j] = 0;
+            }
+        }
     }
-    return 1;
 }
 
 int main(void) {
@@ -102,8 +106,24 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n; cin >> n;
-    cout << (isPrime(n)? "YES": "NO");
+    sieve();
+
+    int n; cin >> n;
+    int A[n];
+
+    int maxi = 0;
+    FOR(i, 0, n) {
+        cin >> A[i];
+        isPrime[A[i]] = 0;
+        maximize(maxi, A[i]);
+    }
+
+    for(int i = 2; i <= limN; i++) {
+        if(isPrime[i]) primes.pb(i);
+    }
+    ll nomi = primes[0];
+    if(nomi > maxi) return cout << "No prime number missing!", 0;
+    cout << nomi;
 
     return (0 ^ 0);
 
