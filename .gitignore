@@ -1,0 +1,10 @@
+# Bỏ file build
+*.exe
+*.out
+*.obj
+*.log
+*.tmp
+
+# Folder test
+input.txt
+output.txt
