@@ -84,29 +84,20 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 1e6 + 5;
-int A[limN];
-
-ll cnt = 0; // đếm cặp nghịch thế
-void dnc(int l, int r) {
-    if(l >= r) return;
-    int mid = (l + r) >> 1;
-    dnc(l, mid);
-    dnc(mid + 1, r);
-
-    // merge
-    vector<int> tmp;
-    int i = l, j = mid + 1;
-    while(i <= mid && j <= r) {
-        if(A[i] <= A[j]) tmp.pb(A[i++]);
-        else {
-            cnt += mid - i + 1;
-            tmp.pb(A[j++]);
+const int limN = 1e7 + 5;
+int lp[limN];
+vector<int> primes;
+void linear_sieve(void) {
+    for(int i = 2; i < limN; i++) {
+        if(lp[i] == 0) {
+            lp[i] = i;
+            primes.pb(i);
+        }
+        for(int j = 0; j < sz(primes) && i * primes[j] <= limN; j++) {
+            lp[i * primes[j]] = primes[j];
+            if(primes[j] == lp[i]) break;
         }
     }
-    while(i <= mid) tmp.pb(A[i++]);
-    while(j <= r) tmp.pb(A[j++]);
-    FOR(k, l, r + 1) A[k] = tmp[k - l];
 }
 
 int main(void) {
@@ -118,11 +109,20 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    FOR(i, 0, n) cin >> A[i];
-    dnc(0, n - 1);
+    linear_sieve();
 
-    cout << cnt;
+    int n; cin >> n;
+    int sq = sqrt(n);
+    ll cnt = 0;
+    for(int i = 0; i < sz(primes) && primes[i] < n; i++) {
+        for(int j = i; j < sz(primes); j++) {
+            ll tmp = 1ll * primes[i] * primes[j];
+            if(tmp > n) break;
+            cnt += tmp;
+        }
+    }
+
+    cout << n << ' ' << cnt;
 
     return (0 ^ 0);
 
