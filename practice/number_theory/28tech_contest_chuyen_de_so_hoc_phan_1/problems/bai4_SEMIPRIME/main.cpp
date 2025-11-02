@@ -84,47 +84,20 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-pair<ll, ll> factor(ll n) {
-    ll s = 0;
-    while ((n & 1) == 0) {
-        s++;
-        n >>= 1;
+const int limN = 1e7 + 5;
+int lp[limN];
+vector<int> primes;
+void linear_sieve(void) {
+    for(int i = 2; i < limN; i++) {
+        if(lp[i] == 0) {
+            lp[i] = i;
+            primes.pb(i);
+        }
+        for(int j = 0; j < sz(primes) && i * primes[j] <= limN; j++) {
+            lp[i * primes[j]] = primes[j];
+            if(primes[j] == lp[i]) break;
+        }
     }
-    return {s, n};
-}
-
-ll pow(ll a, ll b, ll m) {
-    ll res = 1;
-    a = a % m;
-    while(b) {
-        if(b & 1) res = res * a % m;
-        a = a * a % m;
-        b >>= 1;
-    }
-    return res;
-}
-
-bool test_a(ll s, ll d, ll n, ll a) {
-    if (n == a) return true;
-    ll p = pow(a, d, n);
-    if (p == 1) return true;
-    for (; s > 0; s--) {
-        if (p == n-1) return true;
-        p = p * p % n;
-    }
-    return false;
-}
-
-bool miller(ll n) {
-    if (n < 2) return false;
-    if ((n & 1) == 0) return n == 2;
-    ll s, d;
-    tie(s, d) = factor(n-1);
-
-    for(ll t: {2, 3, 5, 7, 11}) {
-        if(!test_a(s, d, n, t)) return 0;
-    }
-    return 1;
 }
 
 int main(void) {
@@ -136,16 +109,20 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
+    linear_sieve();
+
     int n; cin >> n;
-    int A[n];
-    int pcnt = 0;
-    FOR(i, 0, n) {
-        cin >> A[i];
-        if(miller(A[i])) pcnt++;
+    int sq = sqrt(n);
+    ll cnt = 0;
+    for(int i = 0; i < sz(primes) && primes[i] < n; i++) {
+        for(int j = i; j < sz(primes); j++) {
+            ll tmp = 1ll * primes[i] * primes[j];
+            if(tmp > n) break;
+            cnt += tmp;
+        }
     }
 
-
-    cout << 1ll * pcnt * (n - pcnt) + 1ll * pcnt * (pcnt - 1) / 2;
+    cout << n << ' ' << cnt;
 
     return (0 ^ 0);
 
