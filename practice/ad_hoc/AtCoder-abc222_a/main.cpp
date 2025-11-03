@@ -1,3 +1,5 @@
+// https://vjudge.net/problem/AtCoder-abc222_a
+
 #include <bits/stdc++.h>
 #include <unordered_set>
 
@@ -84,15 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-ll ucln(ll a, ll b) {
-    if(b == 0) return a;
-    return ucln(b, a % b);
-}
-
-ll bcnn(ll a, ll b) {
-    return a / ucln(a, b) * b;
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -102,19 +95,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, l, r; cin >> n >> l >> r;
-    int A[n];
-    FOR(i, 0, n) {
-        cin >> A[i];
-    }
-
-    ll cnt = A[0];
-    FOR(i, 1, n) {
-        cnt = bcnn(cnt, A[i]);
-        if(cnt > r) return cout << 0, 0;
-    }
-
-    cout << r / cnt - (l - 1) / cnt;
+    int n; scanf("%d", &n);
+    printf("%04d", n);
 
     return (0 ^ 0);
 

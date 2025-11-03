@@ -1,3 +1,5 @@
+// https://vjudge.net/problem/CodeForces-633A
+
 #include <bits/stdc++.h>
 #include <unordered_set>
 
@@ -84,13 +86,63 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-ll ucln(ll a, ll b) {
-    if(b == 0) return a;
-    return ucln(b, a % b);
+// ax + by = d
+// bx1 + ry1 = d, r = a % b = a - b * (a / b)
+// bx1 + (a - b * a / b) y1
+// bx1 + y1a - y1 * b * a/b
+// ay1 + b(x1 - y1 * a/b)
+
+ll extended_euclid(int a, int b, int &x, int &y) {
+    if(b == 0) {
+        x = 1, y = 0;
+        return a;
+    }
+    int x1, y1;
+    int d = extended_euclid(b, a % b, x1, y1);
+    x = y1;
+    y = x1 - y1 * static_cast<int>(a / b);
+    return d;
 }
 
-ll bcnn(ll a, ll b) {
-    return a / ucln(a, b) * b;
+// (a, b) = d, d | c -> k = c / d
+// -> a(x' * c / d) + b(y' * c/ d) = c
+
+// d | a -> a = d a1
+// d | b -> b = d b1
+// (a1, b1) = 1
+
+// a1(x - x0) = -b1(y - y0)
+
+// a1 | (y - y0) -> y - y0 = ka1
+// -b1 | (x - x0) -> x - x0 = -kb1
+
+// -> x = x0 - k * b / d
+// -> y = y0 + k * a / d
+
+// A = x' * c / d
+// B = y' * c   / d
+
+// -> x = A - k * b / d > 0
+// -> y = B + k * a / d > 0
+
+// k < A * d / b
+// k > -B * d / a
+
+// -B * d / a < k < A * d / b
+
+bool check(int a, int b, int c) {
+
+    int x, y;
+    int d = extended_euclid(a, b, x, y);
+    if (c % d != 0) return 0;
+
+    x *= c / d;
+    y *= c / d;
+
+    ll kl = ceil(-1.0L * y * d / a);
+    ll kr = floor(1.0L * x * d / b);
+
+    return kl <= kr;
 }
 
 int main(void) {
@@ -102,19 +154,19 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, l, r; cin >> n >> l >> r;
-    int A[n];
-    FOR(i, 0, n) {
-        cin >> A[i];
-    }
+    // ax + by = c
+    // (a, b) = d && d | c
 
-    ll cnt = A[0];
-    FOR(i, 1, n) {
-        cnt = bcnn(cnt, A[i]);
-        if(cnt > r) return cout << 0, 0;
+    int a, b, c; cin >> a >> b >> c;
+    if(a == 0) {
+        if(b == 0) return cout << "No", 0;
     }
-
-    cout << r / cnt - (l - 1) / cnt;
+    else if (b == 0) {
+        if(a == 0) return cout << "No", 0;
+    }
+    else {
+        cout << (check(a, b, c)? "Yes": "No");
+    }
 
     return (0 ^ 0);
 
