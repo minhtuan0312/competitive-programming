@@ -13,7 +13,7 @@ using namespace std;
 #define fi first
 #define se second
 
-const ll mod = 1e9 + 7;
+const int mod = 1e9 + 7;
 
 template<class T>
 void maximize(T &x, const T &y) {
@@ -84,44 +84,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
-
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
-}
+const int limN = 105, inf = 1e9 + 7;
+int n, k;
+int A[limN];
+int dp[limN][100005];
 
 int main(void) {
     minhtuan0312;
@@ -132,11 +98,48 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> n >> k;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    dp[0][0] = 1;
+    FOR(i, 1, n + 1) {
+//
+//        FOR(j, 0, k + 1) {
+//
+//            FOR(t, 0, A[i] + 1) {
+//
+//                dp[i][j] += dp[i - 1][j - t];
+//
+//            }
+//
+//        }
+
+        // A[i] <= k
+        // upper: j
+        // lower: j - A[i]
+
+        vector<int> pre(k + 1);
+        pre[0] = dp[i - 1][0];
+        FOR(j, 1, k + 1) {
+            pre[j] = pre[j - 1] + dp[i - 1][j];
+            pre[j] %= mod;
+        }
+        FOR(j, 0, k + 1) {
+            int upper = pre[j];
+            int lower = (j - A[i] - 1 >= 0? pre[j - A[i] - 1]: 0);
+            dp[i][j] = upper - lower;
+            dp[i][j] += mod;
+            dp[i][j] %= mod;
+        }
+
+
+    }
+    cout << dp[n][k];
+
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

@@ -84,44 +84,17 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
+const int INF = 1e9 + 7;
+int n;
+struct g{
+    int a, b, c;
+};
+g happy[100005];
+int dp[100005][3];
+// dp[i][0]: max tổng điểm hạnh phúc tại ngày thứ i của Taro nếu anh ấy ĐI BƠI
+// dp[i][1]: max tổng điểm hạnh phúc tại ngày thứ i của Taro nếu anh ấy BẮT BỌ
+// dp[i][2]: max tổng điểm hạnh phúc tại ngày thứ i của Taro nếu anh ấy LÀM BTVN
 
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
-}
 
 int main(void) {
     minhtuan0312;
@@ -132,11 +105,23 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> n;
+    FOR(i, 1, n + 1) {
+        cin >> happy[i].a >> happy[i].b >> happy[i].c;
+    }
+
+    memset(dp, -0x3f, sizeof dp);
+    FOR(i, 0, 3) dp[0][i] = 0; // base case: trước khi bắt đầu anh ấy không hạnh phúc
+    FOR(i, 1, n + 1) {
+        maximize(dp[i][0], max(dp[i - 1][1], dp[i - 1][2]) + happy[i].a); // hôm nay anh ấy đi bơi thì ngày hôm qua anh ấy không đi bơi
+        maximize(dp[i][1], max(dp[i - 1][0], dp[i - 1][2]) + happy[i].b); // hôm nay anh ấy đi bắt bọ thì ngày hôm qua anh ấy không đi bắt bọ
+        maximize(dp[i][2], max(dp[i - 1][1], dp[i - 1][0]) + happy[i].c); // hôm nay anh ấy đi làm btvn thì ngày hôm qua anh ấy không đi làm btvn
+    }
+
+    cout << max({dp[n][0], dp[n][1], dp[n][2]});
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

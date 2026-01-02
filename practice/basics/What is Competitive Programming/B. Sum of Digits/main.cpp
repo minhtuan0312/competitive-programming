@@ -84,42 +84,39 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+// 12345
+// 00123
+//
+
+int ans = 0;
+string sum(string a, string b) {
+
+    string res = "";
+    if(sz(a) < sz(b)) swap(a, b);
+    while(sz(b) < sz(a)) b = '0' + b;
+
+    int len = sz(a);
+    int carry = 0;
+    for(int i = len - 1; i >= 0; i--) {
+        int tmp = int(a[i] - '0') + int(b[i] - '0') + carry;
+        res = char(tmp % 10 + '0') + res;
+        carry = tmp/10;
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
+    if(carry) res = char(carry + '0') + res;
+
+    return res;
+
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+string solve(string s) {
+    ans++;
+    string res = string(1, s[0]);
+    for(int i = 1; i < sz(s); i++) {
+        res = sum(res, string(1, s[i]));
+    }
+    deb(res);
+    if(sz(res) > 1) return solve(res);
+    else return res;
 
 }
 
@@ -132,11 +129,13 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    string s; cin >> s;
+    if(sz(s) == 1) return cout << 0, 0;
+    solve(s);
+    cout << ans;
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

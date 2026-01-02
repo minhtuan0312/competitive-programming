@@ -84,59 +84,30 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
 
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
+ll randInt(ll l, ll r) {
+    uniform_int_distribution dist(l, r);
+    return dist(rng);
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "main"
     if (fopen(TASK ".inp", "r")) {
-        freopen(TASK ".inp", "r", stdin);
-        freopen(TASK ".out", "w", stdout);
+        freopen(TASK ".inp", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    int n = randInt(1, 100);
+    ll k = randInt(1, 1e12);
+    cout << n << ' ' << k << nl;
+    FOR(i, 1, n + 1) {
+        cout << char('a' + randInt(0, 25));
+    }
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

@@ -84,44 +84,15 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
-    }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
+struct G{
+    int r, color;
+    // color = 0 red
+    // color = 1 green
+};
 
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
-}
+const int limN = 5 * 1e5 + 5;
+G A[limN];
+int n;
 
 int main(void) {
     minhtuan0312;
@@ -132,11 +103,40 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> n;
+    FOR(i, 1, n + 1) {
+        int x;
+        cin >> x;
+        A[i].r = abs(x);
+        A[i].color = x > 0;
+    }
+
+    sort(A + 1, A + 1 + n, [&](const G &a, const G&b) {
+         return a.r > b.r;
+         });
+
+    ll dp[limN][2]; // dp[i][c]: số hộp quà nhiều nhất tại i có màu c
+    memset(dp, 0, sizeof dp);
+    ll res = 0;
+    FOR(i, 1, n + 1) {
+
+        int color = A[i].color;
+        int breadth = A[i].r;
+        dp[i][color] = 1;
+        FOR(j, 1, i) {
+
+            if(A[j].r > breadth && (A[j].color != color)) {
+                maximize(dp[i][color], dp[j][A[j].color] + 1);
+            }
+
+        }
+
+        maximize(res, dp[i][color]);
+    }
+    cout << res;
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

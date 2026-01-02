@@ -84,42 +84,29 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+int n, k;
+const int limN = 1125;
+int lp[limN];
+vector<int> primes;
+
+void linear_sieve() {
+    for(int i = 2; i < limN; i++) {
+        if(!lp[i]) {
+            lp[i] = i;
+            primes.pb(i);
+        }
+        for(int j = 0; j < sz(primes) && i * primes[j] < limN; j++) {
+            lp[i * primes[j]] = primes[j];
+            if(lp[i] == primes[j]) break;
+        }
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+const int limK = 14 + 5;
+ll dp[limK][limN];
+void solve() {
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+    cout << dp[k][n] << nl;
 
 }
 
@@ -132,11 +119,30 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    // dp[i][j] số cách để biểu thị j là tổng của i số nguyên tố khác nhau đôi một
+
+    linear_sieve();
+    //deb(accumulate(all(primes), 0));
+    memset(dp, 0, sizeof dp);
+    dp[0][0] = 1;
+    for(auto p: primes) {
+        for(int j = limN - 1; j >= 1; j--) {
+            FOR(i, 1, limK) {
+                if(j - p >= 0)
+                    dp[i][j] += dp[i - 1][j - p];
+            }
+        }
+    }
+
+    while(cin >> n >> k) {
+        if(n == 0 && k == 0) break;
+
+        solve();
+
+    }
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

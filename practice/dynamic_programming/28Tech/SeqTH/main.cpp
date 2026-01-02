@@ -84,42 +84,27 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+void solve() {
+
+    int n; cin >> n;
+    int A[n + 1];
+    FOR(i, 1, n + 1) cin >> A[i];
+
+    unordered_map<int, int> pos;
+    int dp[n + 1][n + 1];
+    memset(dp, 0, sizeof dp);
+    int best = 0;
+    FOR(i, 1, n) {
+        FOR(j, i + 1, n + 1) {
+            maximize(dp[i][j], 2);
+            if(pos.count(A[j] - A[i])) {
+                maximize(dp[i][j], dp[pos[A[j] - A[i]]][i] + 1);
+            }
+            maximize(best, dp[i][j]);
+        }
+        pos[A[i]] = i;
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
-
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+    cout << best << nl;
 
 }
 
@@ -132,11 +117,13 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    int t = 1;
+    while(t--) {
+        solve();
+    }
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

@@ -84,44 +84,29 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+struct segment_tree{
+    int n;
+    vector<ll> st;
+    segment_tree() {}
+    segment_tree(int n) : n(n), st((n << 1) + 5, LLONG_MAX) {}
+
+    void update(int idx, ll val) {
+        idx--;
+        for(st[idx += n] = val; idx > 1; idx >>= 1) {
+            st[idx >> 1] = min(st[idx], st[idx ^ 1]);
+        }
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
 
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
-}
+    ll query(int l, int r) {
+        l--;
+        ll res = LLONG_MAX;
+        for(l += n, r += n; l < r; l >>= 1, r >>= 1) {
+            if(l & 1) minimize(res, st[l++]);
+            if(r & 1) minimize(res, st[--r]);
+        }
+        return res;
+    }
+};
 
 int main(void) {
     minhtuan0312;
@@ -132,11 +117,29 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    int n; cin >> n;
+    int t[n + 1], p[n + 1];
+    vector<int> deadline[n + 2];
+    FOR(i, 1, n + 1) {
+        cin >> t[i] >> p[i];
+        deadline[t[i] + 1].emplace_back(i);
+    }
+
+    segment_tree T(n);
+    ll dp[n + 1];
+    memset(dp, 0x3f, sizeof dp);
+    dp[1] = p[1];
+    T.update(1, dp[1]);
+    FOR(i, 2, n + 1) {
+        dp[i] = T.query(1, i - 1) + p[i];
+        for(auto x: deadline[i]) T.update(x, LLONG_MAX);
+        T.update(i, dp[i]);
+    }
+    cout << T.st[1];
+
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

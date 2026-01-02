@@ -84,42 +84,77 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+int m1, m2, n;
+struct g{
+    int w, v;
+};
+
+g A[205];
+
+namespace dp_3d {
+
+    ll dp[205][205][205]; //dp[i][w1][w2]: giá trị lớn nhất tại vật thứ i với túi w1 và túi w2 là
+
+    void solve() {
+
+        memset(dp, 0, sizeof dp);
+
+        FOR(i, 1, n + 1) {
+            FOR(w1, 0, m1 + 1) {
+                FOR(w2, 0, m2 + 1) {
+
+                    //TH1 skip
+                    maximize(dp[i][w1][w2], dp[i - 1][w1][w2]);
+
+                    //TH2 bỏ vô túi w1
+                    if(A[i].w <= w1)
+                        maximize(dp[i][w1][w2], dp[i - 1][w1 - A[i].w][w2] + A[i].v);
+
+                    //TH3 bỏ vô túi w2
+                    if(A[i].w <= w2)
+                        maximize(dp[i][w1][w2], dp[i - 1][w1][w2 - A[i].w] + A[i].v);
+
+                }
+            }
+        }
+
+        cout << dp[n][m1][m2];
+
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
+
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+namespace dp_2d {
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
+    ll dp[205][205]; // dp[w1][w2]: giá trị lớn nhất với túi w1 và túi w2 là
 
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
+    void solve() {
 
-// -x0 * d / b < k < y0 * d / a
+        memset(dp, 0, sizeof dp);
+        FOR(i, 1, n + 1) {
 
-bool diophinate(int a, int b, int c) {
+            for(int w1 = m1; w1 >= 0; w1--) {
 
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
+                for(int w2 = m2; w2 >= 0; w2--) {
 
-    x *= c / d;
-    y *= c / d;
+                    //TH2 bỏ vô túi w1
+                    if(A[i].w <= w1)
+                        maximize(dp[w1][w2], dp[w1 - A[i].w][w2] + A[i].v);
 
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+                    //TH3 bỏ vô túi w2
+                    if(A[i].w <= w2)
+                        maximize(dp[w1][w2], dp[w1][w2 - A[i].w] + A[i].v);
+
+                }
+
+            }
+
+        }
+
+        cout << dp[m1][m2];
+
+
+    }
 
 }
 
@@ -132,11 +167,15 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> m1 >> m2 >> n;
+    FOR(i, 1, n + 1) {
+        cin >> A[i].v >> A[i].w;
+    }
+
+    dp_2d::solve();
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

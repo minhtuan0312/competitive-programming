@@ -84,42 +84,43 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+const int limN = 2e5+5;
+int bit[limN];
+void upd(int idx, int val) {
+    for(; idx; idx -= (idx & -idx)) {
+        maximize(bit[idx], val);
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
+}
+int query(int idx) {
+    int res = 0;
+    for(; idx < limN; idx += (idx & -idx)) {
+        maximize(res, bit[idx]);
+    }
+    return res;
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+int dp[limN];
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
+void solve() {
 
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
+    int n; cin >> n;
+    pair<int, int> A[n + 1];
+    FOR(i, 1, n + 1) cin >> A[i].fi >> A[i].se;
+    sort(A + 1, A + 1 + n, [&](const pair<int, int> &x, const pair<int, int> &y) {
+         return x.fi == y.fi ? x.se > y.se : x.fi < y.fi;
+         });
 
-// -x0 * d / b < k < y0 * d / a
+    // dp[i] số búp bê lồng lớn nhất khi xét đến i
+    // dp[i] = max(dp[j]) + 1 với j < i và wj < wi && hj < hi
 
-bool diophinate(int a, int b, int c) {
+    memset(bit, 0, sizeof bit);
+    memset(dp, 0, sizeof dp);
 
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+    FOR(i, 1, n + 1) {
+        dp[i] = query(A[i].se) + 1;
+        upd(A[i].se, dp[i]);
+    }
+    cout << *max_element(dp + 1, dp + 1 + n) << nl;
 
 }
 
@@ -132,11 +133,14 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    int t; cin >> t;
+    while(t--) {
+        solve();
+    }
+
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

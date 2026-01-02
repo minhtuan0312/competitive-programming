@@ -84,44 +84,27 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+struct fenwick_tree{
+
+    int n;
+    vector<int> BIT;
+    fenwick_tree(int a) : n(a), BIT(n + 1) {}
+
+    void upd(int i, int v) {
+        for(; i <= n; i += (i & -i)) {
+            maximize(BIT[i], v);
+        }
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+    int query(int i) {
+        int res = 0;
+        for(; i >= 1; i -= (i & -i)) {
+            maximize(res, BIT[i]);
+        }
+        return res;
+    }
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -132,11 +115,26 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    int n; cin >> n;
+    int A[n + 1];
+    FOR(i, 1, n + 1) cin >> A[i];
+
+    vector<int> compress;
+    FOR(i, 1, n + 1) compress.emplace_back(A[i]);
+    sort(all(compress));
+    FOR(i, 1, n + 1) A[i] = lower_bound(all(compress), A[i]) - compress.begin() + 1;
+
+    fenwick_tree fenw(n);
+    int dp[n + 1];
+    FOR(i, 1, n + 1) {
+        dp[i] = fenw.query(A[i] - 1) + 1;
+        fenw.upd(A[i], dp[i]);
+    }
+
+    cout << *max_element(dp + 1, dp + n + 1);
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

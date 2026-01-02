@@ -84,42 +84,52 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+const int limN = 355;
+int n;
+int lp[limN];
+vector<int> primes;
+
+void linear_sieve() {
+    FOR(i, 2, limN) {
+        if(!lp[i]) {
+            lp[i] = i;
+            primes.emplace_back(i);
+        }
+        for(int j = 0; j < sz(primes) && i * primes[j] < limN; j++) {
+            lp[i * primes[j]] = primes[j];
+            if(i == primes[j]) break;
+        }
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+unsigned ll dp[limN + 1][limN + 1];
+void init() {
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
+    linear_sieve();
 
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
+    memset(dp, 0, sizeof dp);
 
-// -x0 * d / b < k < y0 * d / a
+    FOR(i, 0, limN + 1) {
+        dp[0][i] = 1;
+    }
+    FOR(i, 1, sz(primes)) {
+        FOR(j, 0, limN + 1) {
+            int p = 1;
+            maximize(dp[i][j], dp[i - 1][j]);
+            while(j - p >= 0) {
+                maximize(dp[i][j], dp[i - 1][j - p] * p);
+                p *= primes[i - 1];
+            }
+        }
 
-bool diophinate(int a, int b, int c) {
+    }
 
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
+}
 
-    x *= c / d;
-    y *= c / d;
+void solve() {
 
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+    cin >> n;
+    cout << dp[sz(primes) - 1][n] << nl;
 
 }
 
@@ -132,11 +142,14 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    init();
+    int t; cin >> t;
+    while(t--) {
+        solve();
+    }
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

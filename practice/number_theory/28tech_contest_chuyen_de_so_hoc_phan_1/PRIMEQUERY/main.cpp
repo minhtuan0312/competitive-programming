@@ -2,6 +2,7 @@
 #include <unordered_set>
 
 using namespace std;
+#define bit(mask, i) ((mask >> i) & 1)
 #define ll long long
 #define nl '\n'
 #define all(x) x.begin(), x.end()
@@ -10,6 +11,7 @@ using namespace std;
 #define minhtuan0312 ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 #define sz(x) ((int)(x).size())
 #define pb push_back
+#define eb emplace_back
 #define fi first
 #define se second
 
@@ -84,43 +86,39 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+vector<ll> divp;
+vector<pair<ll, int>> ie;
+void factorization(ll n) {
+    vector<pair<int, int>> res;
+    int sq = sqrt(n);
+    FOR(i, 2, sq + 1) {
+        if(n % i == 0){
+            divp.eb(i);
+            while(n % i == 0){
+                n/=i;
+            }
+        }
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
+    if(n != 1) divp.eb(n);
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+void duyet() {
+    int m = sz(divp);
+    for(int mask = 1; mask < (1 << m); mask++) {
+        ll prod = 1;
+        int cnt = 0;
+        FOR(i, 0, m) {
+            if(bit(mask, i)) {
+                prod *= divp[i];
+                cnt++;
+            }
+        }
+        if(cnt) ie.pb({prod, cnt});
+    }
+}
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
+ll compute(ll l, ll r, ll x) {
+    return r/x - (l - 1)/ x;
 }
 
 int main(void) {
@@ -132,11 +130,23 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    ll n, q; cin >> n >> q;
+
+    factorization(n);
+    duyet();
+
+    while(q--) {
+        ll l, r; cin >> l >> r;
+        ll res = 0;
+        for(auto [p, cnt]: ie) {
+            if(cnt & 1) res += compute(l, r, p);
+            else res -= compute(l, r, p);
+        }
+        cout << r - l + 1 - res << nl;
+    }
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

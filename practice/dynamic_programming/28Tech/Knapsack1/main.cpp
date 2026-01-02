@@ -84,42 +84,50 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+int n, maxw;
+struct g{
+    int w, v;
+};
+g A[105];
+
+namespace dp_2d {
+
+    ll dp[105][100005]; //dp[i][j] max giá trị đồ vật Taro có thể mang về nhà khi xét tới vật thứ i với trọng lượng tối đa là j
+
+    void solve(void) {
+
+        memset(dp, 0, sizeof dp);
+        FOR(i, 1, n + 1) {
+            FOR(j, 1, maxw + 1) {
+                //TH1 skip
+                maximize(dp[i][j], dp[i - 1][j]);
+                //TH2 take
+                if(A[i].w <= j) {
+                    maximize(dp[i][j], dp[i - 1][j - A[i].w] + A[i].v);
+                }
+            }
+        }
+        cout << dp[n][maxw];
+
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
+
 }
 
-// ax + by = d
-// ax * c / d + b * c / d = c
+namespace dp_1d {
 
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
+    ll dp[100005]; // dp[w] cướp được tổng w trọng lượng thì tổng giá trị lớn nhất là
 
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
+    void solve(void){
 
-// -x0 * d / b < k < y0 * d / a
+        memset(dp, 0, sizeof dp);
+        FOR(i, 1, n + 1) {
+            for(int j = maxw; j >= A[i].w; j--) { // chạy ngược lại vì nếu chạy xuôi thì sẽ dẫn đến chạy qua những giá trị đã cập nhật và dẫn đến bài toán trở thành unbounded knapsack
+                maximize(dp[j], dp[j - A[i].w] + A[i].v);
+            }
+        }
+        cout << dp[maxw];
 
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
+    }
 
 }
 
@@ -132,11 +140,14 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> n >> maxw;
+    FOR(i, 1, n + 1) cin >> A[i].w >> A[i].v;
+
+    //dp_2d::solve();
+    dp_1d::solve();
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair

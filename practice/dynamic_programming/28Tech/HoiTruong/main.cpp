@@ -84,43 +84,21 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int extended_euclid(int a, int b, int &x, int &y) {
-    if(b == 0) {
-        x = 1;
-        y = 0;
-        return a;
+const int limN = 1e4 + 5;
+int n;
+pair<int, int> A[limN];
+int dp[limN];
+
+int find(int x) {
+    int l = 1, r = n, res = -1;
+    while(l <= r) {
+        int m = (l + r) >> 1;
+        if(A[m].se <= x) {
+            res = m;
+            l = m + 1;
+        } else r = m - 1;
     }
-    int x1, y1;
-    int d = extended_euclid(b, a % b, x1, y1);
-    x = y1;
-    y = x1 - y1 * (a / b);
-    return d;
-}
-
-// ax + by = d
-// ax * c / d + b * c / d = c
-
-// ax + by = c
-// a(x0 + k(b / d)) + b(y0 - k(a / d)) = c
-
-// x = x0 + k(b / d) > 0
-// y = y0 - k(a / d) > 0
-
-// -x0 * d / b < k < y0 * d / a
-
-bool diophinate(int a, int b, int c) {
-
-    int x, y;
-    int d = extended_euclid(a, b, x, y);
-    if(c % d != 0) return 0;
-
-    x *= c / d;
-    y *= c / d;
-
-    int l = ceil(-1.0f * x * d / b);
-    int r = floor(1.0f * y * d / a);
-    return l <= r;
-
+    return res;
 }
 
 int main(void) {
@@ -132,11 +110,29 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int a, b, c; cin >> a >> b >> c;
-    cout << (diophinate(a, b, c)? "Yes": "No");
+    cin >> n;
+    FOR(i, 1, n + 1) cin >> A[i].fi >> A[i].se;
+
+    sort(A + 1, A + 1 + n, [&](const pair<int, int> &x, const pair<int, int> &y) {
+         return x.se == y.se? x.fi < y.fi : x.se < y.se;
+         });
+
+    //dp[i] = tổng thời gian lớn nhất khi xét các cuộc họp từ 1..i
+    //dp[i] = max(dp[j]) + (end - start)
+    dp[1] = A[1].se - A[1].fi;
+    FOR(i, 2, n + 1) {
+        dp[i] = dp[i - 1]; // skip
+        int j = find(A[i].fi);
+        if(j != -1) {
+            maximize(dp[i], dp[j] + (A[i].se - A[i].fi));
+        } else {
+            maximize(dp[i], (A[i].se - A[i].fi));
+        }
+    }
+    cout << *max_element(dp + 1, dp + 1 + n);
 
     return (0 ^ 0);
 
 }
 
-// study smart, not hard
+// thou art fair
