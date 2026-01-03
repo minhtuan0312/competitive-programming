@@ -2,6 +2,7 @@
 #include <unordered_set>
 
 using namespace std;
+#define bit(mask, i) ((mask >> i) & 1)
 #define ll long long
 #define nl '\n'
 #define all(x) x.begin(), x.end()
@@ -10,6 +11,7 @@ using namespace std;
 #define minhtuan0312 ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 #define sz(x) ((int)(x).size())
 #define pb push_back
+#define eb emplace_back
 #define fi first
 #define se second
 
@@ -84,6 +86,21 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+int A, B, C, n;
+
+int cnt(ll x) {
+    int res = 0;
+    while(x) {
+        res++;
+        x /= 10;
+    }
+    return res;
+}
+
+ll lcm(ll a, ll b) {
+    return a / __gcd(a, b) * b;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -93,18 +110,20 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    vector<ll> pre;
-    ll s = 0;
-    for(int i = 1; s <= 1e6; i++) {
-        s += i;
-        pre.pb(s);
+    cin >> A >> B >> C >> n;
+    ll LCM = lcm(A, lcm(B, C));
+    ll l = 1, r = 9223372036854775807 / LCM;
+    ll res = -1;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(cnt(m * LCM) == n) {
+            res = m * LCM;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
-
-    int t; cin >> t;
-    while(t--) {
-        int x; cin >> x;
-        cout << (binary_search(all(pre), x)? "Y":"N") << nl;
-    }
+    cout << res;
 
     return (0 ^ 0);
 
