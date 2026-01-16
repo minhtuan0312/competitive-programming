@@ -86,64 +86,57 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Trie {
-    static const int MAXNODE = 1e4 * 105;
-    int cnt = 0;
-    int cntPass[MAXNODE], cntEnd[MAXNODE], nx[MAXNODE][26];
-    Trie() {
+struct trie{
+    static const int MAXNODE = 1e6 + 5;
+    int cnt, cntPass[MAXNODE], cntEnd[MAXNODE], nxt[MAXNODE][26];
+    trie() {
         cnt = 0;
         memset(cntPass, 0, sizeof cntPass);
         memset(cntEnd, 0, sizeof cntEnd);
-        memset(nx, 0, sizeof nx);
+        memset(nxt, 0, sizeof nxt);
     }
     void Insert(const string &s) {
         int u = 0;
         cntPass[u]++;
-        for(char c: s) {
+        for(char c : s) {
             int k = c - 'a';
-            if(!nx[u][k]) nx[u][k] = ++cnt;
-            u = nx[u][k];
+            if(!nxt[u][k]) nxt[u][k] = ++cnt;
+            u = nxt[u][k];
             cntPass[u]++;
         }
         cntEnd[u]++;
     }
-} t;
+    int CountPrefix(const string &s) {
+        int u = 0;
+        for(char c : s) {
+            int k = c - 'a';
+            if(!nxt[u][k]) return 0;
+            u = nxt[u][k];
+        }
+        return cntPass[u];
+    }
+};
+
+trie t;
 int main(void) {
     minhtuan0312;
 
-    #define TASK "depart"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int q; cin >> q;
+    int n, q; cin >> n >> q;
     string s;
-    while(q--) {
+    while(n--) {
         cin >> s;
         t.Insert(s);
     }
-    cin >> s;
-    int n = sz(s);
-    s = ' ' + s;
-
-    ll dp[n + 1];
-    memset(dp, 0, sizeof dp);
-    dp[0] = 1;
-    FOR(j, 0, n) {
-        if(!dp[j]) continue;
-        int u = 0;
-        FOR(i, j + 1, min(n, j + 100) + 1) {
-            int k = s[i] - 'a';
-            if(!t.nx[u][k]) break;
-            u = t.nx[u][k];
-            if(t.cntEnd[u] > 0) {
-                dp[i] += dp[j];
-                dp[i] %= mod;
-            }
-        }
+    while(q--) {
+        cin >> s;
+        cout << t.CountPrefix(s) << nl;
     }
-    cout << dp[n];
 
     return (0 ^ 0);
 

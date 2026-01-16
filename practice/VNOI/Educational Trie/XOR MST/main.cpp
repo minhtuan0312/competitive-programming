@@ -86,55 +86,16 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-ll bcnn(ll a, ll b) {
-    return a / __gcd(a, b) * b;
-}
-unsigned ll BC[10005];
-
-ll compress(ll n) {
-    ll res = 2;
-    while(n % res == 0) res++;
-    return res;
-}
-// giả sử k là số mà n không chia hết nhỏ nhất thì từ 1 đến k - 1 n sẽ chia hết, tức n chia hết cho bcnn(1 ... k - 1)
-
-ll compressness(ll n) {
-    int res = 0;
-    ll cur = n;
-    while(1) {
-        res++;
-        cur = compress(cur);
-        if(cur <= 2) break;
-    }
-    return res;
-}
-
-ll compute(ll n) {
-    ll res = 0;
-    FOR(k, 2, 44) {
-        ll cnt = n / BC[k - 1] - n / BC[k];
-        res += (k == 2 ? cnt:(compressness(k) + 1) * cnt);
-    }
-    return res;
-}
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "compress"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
-    memset(BC, 0, sizeof BC);
-    BC[0] = 1;
-    FOR(i, 1, 44) {
-        BC[i] = bcnn(BC[i - 1], i);
-        if(BC[i] >= 1e18) break;
-    }
 
-    ll a, b; cin >> a >> b;
-    cout << compute(b) - compute(a - 1);
+
 
     return (0 ^ 0);
 

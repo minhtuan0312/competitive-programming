@@ -86,64 +86,89 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Trie {
-    static const int MAXNODE = 1e4 * 105;
-    int cnt = 0;
-    int cntPass[MAXNODE], cntEnd[MAXNODE], nx[MAXNODE][26];
-    Trie() {
+const int limN = 5e5 + 5;
+const int limLen = 10 + 5;
+int n;
+string bank[limN];
+
+struct trie{
+    static const int MAXNODE = limN * limLen;
+    int cnt, nxt[MAXNODE][26], cntEnd[MAXNODE];
+    int bestId[MAXNODE], bestFreq[MAXNODE], wordId[MAXNODE];
+    trie() {
         cnt = 0;
-        memset(cntPass, 0, sizeof cntPass);
+        memset(nxt, 0, sizeof nxt);
         memset(cntEnd, 0, sizeof cntEnd);
-        memset(nx, 0, sizeof nx);
+        memset(bestId, -1, sizeof bestId);
+        memset(bestFreq, 0, sizeof bestFreq);
+        memset(wordId, -1, sizeof wordId);
     }
-    void Insert(const string &s) {
+    void Insert(const string &s, int id) {
         int u = 0;
-        cntPass[u]++;
-        for(char c: s) {
+        for(char c : s) {
             int k = c - 'a';
-            if(!nx[u][k]) nx[u][k] = ++cnt;
-            u = nx[u][k];
-            cntPass[u]++;
+            if(!nxt[u][k]) nxt[u][k] = ++cnt;
+            u = nxt[u][k];
         }
         cntEnd[u]++;
+        if(wordId[u] == -1)
+            wordId[u] = id;
     }
-} t;
+    void dfs(int u = 0) {
+        bestFreq[u] = 0;
+        bestId[u] = -1;
+        if(cntEnd[u] > 0) {
+            bestFreq[u] = cntEnd[u];
+            bestId[u] = wordId[u];
+        }
+        FOR(k, 0, 26) {
+            int v = nxt[u][k];
+            if(!v) continue;
+            dfs(v);
+            if(bestId[v] == -1) continue;
+            if(bestId[u] == -1 || bestFreq[u] < bestFreq[v] || bestFreq[u] == bestFreq[v] && (bank[bestId[u]] > bank[bestId[v]])) {
+                bestFreq[u] = bestFreq[v];
+                bestId[u] = bestId[v];
+            }
+        }
+    }
+    pair<string, int> getBestWord(const string &s) {
+        int u = 0;
+        for(char c: s) {
+            int k = c - 'a';
+            if(!nxt[u][k]) return {"", -1};
+            u = nxt[u][k];
+        }
+        if(bestId[u] == -1) return {"", -1};
+        return {bank[bestId[u]], bestFreq[u]};
+    }
+};
+
+trie t;
 int main(void) {
     minhtuan0312;
 
-    #define TASK "depart"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
+    cin >> n;
+    FOR(i, 1, n + 1) {
+        cin >> bank[i];
+        t.Insert(bank[i], i);
+    }
+    t.dfs();
     int q; cin >> q;
     string s;
     while(q--) {
         cin >> s;
-        t.Insert(s);
+        auto res = t.getBestWord(s);
+        if(res.se == -1) cout << -1 << nl;
+        else cout << res.fi << ' ' << res.se << nl;
     }
-    cin >> s;
-    int n = sz(s);
-    s = ' ' + s;
 
-    ll dp[n + 1];
-    memset(dp, 0, sizeof dp);
-    dp[0] = 1;
-    FOR(j, 0, n) {
-        if(!dp[j]) continue;
-        int u = 0;
-        FOR(i, j + 1, min(n, j + 100) + 1) {
-            int k = s[i] - 'a';
-            if(!t.nx[u][k]) break;
-            u = t.nx[u][k];
-            if(t.cntEnd[u] > 0) {
-                dp[i] += dp[j];
-                dp[i] %= mod;
-            }
-        }
-    }
-    cout << dp[n];
 
     return (0 ^ 0);
 

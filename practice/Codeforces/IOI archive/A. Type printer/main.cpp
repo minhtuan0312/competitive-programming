@@ -86,64 +86,82 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Trie {
-    static const int MAXNODE = 1e4 * 105;
-    int cnt = 0;
-    int cntPass[MAXNODE], cntEnd[MAXNODE], nx[MAXNODE][26];
-    Trie() {
+vector<int> res;
+struct trie{
+    static const int MAXNODE = 500005;
+    int nxt[MAXNODE][26], cnt;
+    bool isEnd[MAXNODE], on_longest_path[MAXNODE];
+    trie() {
         cnt = 0;
-        memset(cntPass, 0, sizeof cntPass);
-        memset(cntEnd, 0, sizeof cntEnd);
-        memset(nx, 0, sizeof nx);
+        memset(nxt, 0, sizeof nxt);
+        memset(isEnd, 0, sizeof isEnd);
+        memset(on_longest_path, 0, sizeof on_longest_path);
     }
     void Insert(const string &s) {
         int u = 0;
-        cntPass[u]++;
-        for(char c: s) {
+        for(const char &c: s) {
             int k = c - 'a';
-            if(!nx[u][k]) nx[u][k] = ++cnt;
-            u = nx[u][k];
-            cntPass[u]++;
+            if(!nxt[u][k]) nxt[u][k] = ++cnt;
+            u = nxt[u][k];
         }
-        cntEnd[u]++;
+        isEnd[u] = 1;
     }
-} t;
+    void dfs(int u = 0) {
+
+        if(isEnd[u]) res.eb('P');
+
+        int special = -1;
+        FOR(k, 0, 26) {
+            if(!nxt[u][k]) continue;
+            int v = nxt[u][k];
+            if(on_longest_path[v]) {
+                special = k;
+                break;
+            }
+        }
+        FOR(k, 0, 26) {
+            if(!nxt[u][k] || k == special) continue;
+            res.eb(char(k + 'a'));
+            dfs(nxt[u][k]);
+            res.eb('-');
+        }
+
+        if(special != -1) {
+            res.eb(char(special + 'a'));
+            dfs(nxt[u][special]);
+        }
+
+    }
+};
+
+trie t;
 int main(void) {
     minhtuan0312;
 
-    #define TASK "depart"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int q; cin >> q;
-    string s;
-    while(q--) {
+    res.reserve(1e6);
+
+    int n; cin >> n;
+    string s, longest_word;
+    while(n--) {
         cin >> s;
+        if(sz(longest_word) < sz(s)) longest_word = s;
         t.Insert(s);
     }
-    cin >> s;
-    int n = sz(s);
-    s = ' ' + s;
 
-    ll dp[n + 1];
-    memset(dp, 0, sizeof dp);
-    dp[0] = 1;
-    FOR(j, 0, n) {
-        if(!dp[j]) continue;
-        int u = 0;
-        FOR(i, j + 1, min(n, j + 100) + 1) {
-            int k = s[i] - 'a';
-            if(!t.nx[u][k]) break;
-            u = t.nx[u][k];
-            if(t.cntEnd[u] > 0) {
-                dp[i] += dp[j];
-                dp[i] %= mod;
-            }
-        }
+    int u = 0;
+    for(const char &c: longest_word) {
+        u = t.nxt[u][c - 'a'];
+        t.on_longest_path[u] = 1;
     }
-    cout << dp[n];
+    t.dfs();
+    cout << sz(res) << nl;
+    for(const char &c: res) cout << c << nl;
 
     return (0 ^ 0);
 

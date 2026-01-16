@@ -86,64 +86,22 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Trie {
-    static const int MAXNODE = 1e4 * 105;
-    int cnt = 0;
-    int cntPass[MAXNODE], cntEnd[MAXNODE], nx[MAXNODE][26];
-    Trie() {
-        cnt = 0;
-        memset(cntPass, 0, sizeof cntPass);
-        memset(cntEnd, 0, sizeof cntEnd);
-        memset(nx, 0, sizeof nx);
-    }
-    void Insert(const string &s) {
-        int u = 0;
-        cntPass[u]++;
-        for(char c: s) {
-            int k = c - 'a';
-            if(!nx[u][k]) nx[u][k] = ++cnt;
-            u = nx[u][k];
-            cntPass[u]++;
-        }
-        cntEnd[u]++;
-    }
-} t;
 int main(void) {
     minhtuan0312;
 
-    #define TASK "depart"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int q; cin >> q;
-    string s;
-    while(q--) {
-        cin >> s;
-        t.Insert(s);
+    int t; cin >> t;
+    while(t--) {
+        int n; cin >> n;
+        int even = 0xAAAAAAAA;
+        int odd = ~even;
+        cout << (((n & even) >> 1) | ((n & odd) << 1)) << nl;
     }
-    cin >> s;
-    int n = sz(s);
-    s = ' ' + s;
-
-    ll dp[n + 1];
-    memset(dp, 0, sizeof dp);
-    dp[0] = 1;
-    FOR(j, 0, n) {
-        if(!dp[j]) continue;
-        int u = 0;
-        FOR(i, j + 1, min(n, j + 100) + 1) {
-            int k = s[i] - 'a';
-            if(!t.nx[u][k]) break;
-            u = t.nx[u][k];
-            if(t.cntEnd[u] > 0) {
-                dp[i] += dp[j];
-                dp[i] %= mod;
-            }
-        }
-    }
-    cout << dp[n];
 
     return (0 ^ 0);
 
