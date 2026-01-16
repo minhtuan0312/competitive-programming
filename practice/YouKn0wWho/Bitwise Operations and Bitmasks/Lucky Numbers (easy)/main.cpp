@@ -86,6 +86,28 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+vector<ll> nums;
+void init() {
+    for(int len = 2; len <= 10; len+=2) {
+        for(int mask = 0; mask < (1 << len); mask++) {
+            int cnt4 = 0;
+            int cnt7 = 0;
+            ll cur = 0;
+            FOR(i, 0, len) {
+                cur *= 10;
+                if(bit(mask, i)) {
+                    cur += 4;
+                    cnt4++;
+                } else {
+                    cur += 7;
+                    cnt7++;
+                }
+            }
+            if(cnt4 == cnt7) nums.eb(cur);
+        }
+    }
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,15 +117,12 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; cin >> s;
-    auto pos = s.find('0');
-    string res = "";
-    FOR(i, 0, sz(s)) {
-        if(i == pos) continue;
-        res.push_back(s[i]);
-    }
-    if(sz(res) == sz(s)) res.pop_back();
-    cout << res;
+    init();
+    ll n; cin >> n;
+    sort(all(nums));
+    deb(nums);
+    cout << *lower_bound(all(nums), n);
+
     return (0 ^ 0);
 
 }

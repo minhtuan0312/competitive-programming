@@ -86,6 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct item{
+    int w, v;
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,15 +99,24 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; cin >> s;
-    auto pos = s.find('0');
-    string res = "";
-    FOR(i, 0, sz(s)) {
-        if(i == pos) continue;
-        res.push_back(s[i]);
+    int n, w; cin >> n >> w;
+    item A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].w >> A[i].v;
     }
-    if(sz(res) == sz(s)) res.pop_back();
-    cout << res;
+
+    int dp[n + 1][w + 1];
+    memset(dp, 0, sizeof dp);
+
+    FOR(i, 1, n + 1) {
+        for(int j = w; j >= 0; j--) {
+            maximize(dp[i][j], dp[i - 1][j]);
+            if(j - A[i].w >= 0)
+                maximize(dp[i][j], dp[i - 1][j - A[i].w] + A[i].v);
+        }
+    }
+    cout << dp[n][w];
+
     return (0 ^ 0);
 
 }

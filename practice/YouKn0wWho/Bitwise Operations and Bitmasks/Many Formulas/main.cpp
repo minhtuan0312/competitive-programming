@@ -86,6 +86,14 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+ll convert(string &s) {
+    ll res = 0;
+    for(const char & c : s) {
+        res = res * 10 + (c - '0');
+    }
+    return res;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -96,14 +104,22 @@ int main(void) {
     }
 
     string s; cin >> s;
-    auto pos = s.find('0');
-    string res = "";
-    FOR(i, 0, sz(s)) {
-        if(i == pos) continue;
-        res.push_back(s[i]);
+    int n = sz(s);
+    ll res = 0;
+    for(int mask = 0; mask < (1 << (n - 1)); mask++) {
+        int last = 0;
+        FOR(i, 0, n - 1) {
+            if(bit(mask, i)) {
+                string t = s.substr(last, i - last + 1);
+                res += convert(t);
+                last = i + 1;
+            }
+        }
+        string t = s.substr(last);
+        res += convert(t);
     }
-    if(sz(res) == sz(s)) res.pop_back();
     cout << res;
+
     return (0 ^ 0);
 
 }
