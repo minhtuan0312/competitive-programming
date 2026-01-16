@@ -96,22 +96,11 @@ int main(void) {
     }
 
     int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll ans = LLONG_MAX;
-    for(int mask = 0; mask < (1 << n); mask++) {
-        ll group1 = 0, group2 = 0;
-        FOR(i, 1, n + 1) {
-            if(bit(mask, i - 1)) {
-                group1 += A[i];
-            } else {
-                group2 += A[i];
-            }
-        }
-        minimize(ans, abs(group1 - group2));
-    }
-    cout << ans;
+    vector<int> A(n);
+    FOR(i, 0, n) cin >> A[i];
+    vector<int> B(A);
+    reverse(all(B));
+    cout << (A == B? "YES": "NO");
 
     return (0 ^ 0);
 

@@ -86,6 +86,15 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+ll target;
+bool check(ll cur) {
+    if(cur > target) return 0;
+    if(target == cur) return 1;
+    if(check(cur * 10)) return 1;
+    if(check(cur * 20)) return 1;
+    return 0;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,23 +104,12 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll ans = LLONG_MAX;
-    for(int mask = 0; mask < (1 << n); mask++) {
-        ll group1 = 0, group2 = 0;
-        FOR(i, 1, n + 1) {
-            if(bit(mask, i - 1)) {
-                group1 += A[i];
-            } else {
-                group2 += A[i];
-            }
-        }
-        minimize(ans, abs(group1 - group2));
+    int t; cin >> t;
+    while(t--) {
+        cin >> target;;
+        cout << (check(1)? "YES": "NO") << nl;
     }
-    cout << ans;
+
 
     return (0 ^ 0);
 

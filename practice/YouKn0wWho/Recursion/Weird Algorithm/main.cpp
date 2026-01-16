@@ -86,6 +86,13 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+void weird(ll n) {
+    cout << n << ' ';
+    if(n <= 1) return;
+    if (n & 1) return weird(3 * n + 1), void();
+    else return weird(n >> 1);
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,23 +102,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll ans = LLONG_MAX;
-    for(int mask = 0; mask < (1 << n); mask++) {
-        ll group1 = 0, group2 = 0;
-        FOR(i, 1, n + 1) {
-            if(bit(mask, i - 1)) {
-                group1 += A[i];
-            } else {
-                group2 += A[i];
-            }
-        }
-        minimize(ans, abs(group1 - group2));
-    }
-    cout << ans;
+    ll n; cin >> n;
+    weird(n);
 
     return (0 ^ 0);
 

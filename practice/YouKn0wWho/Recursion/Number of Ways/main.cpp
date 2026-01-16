@@ -95,23 +95,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll ans = LLONG_MAX;
-    for(int mask = 0; mask < (1 << n); mask++) {
-        ll group1 = 0, group2 = 0;
-        FOR(i, 1, n + 1) {
-            if(bit(mask, i - 1)) {
-                group1 += A[i];
-            } else {
-                group2 += A[i];
-            }
-        }
-        minimize(ans, abs(group1 - group2));
+    int dp[16];
+    dp[0] = 1;
+    dp[1] = 1;
+    dp[2] = 2;
+    FOR(i, 3, 16) {
+        dp[i] = dp[i - 1] + dp[i - 2] + dp[i - 3];
     }
-    cout << ans;
+
+    int s, e; cin >> s >> e;
+    cout << dp[e - s];
 
     return (0 ^ 0);
 

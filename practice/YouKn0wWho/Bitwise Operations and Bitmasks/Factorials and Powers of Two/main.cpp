@@ -86,6 +86,38 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+ll fact[16];
+
+vector<ll> binary_decompose(ll n) {
+    vector<ll> res;
+    ll cur = 1;
+    while(n) {
+        if(n & 1) res.pb(cur);
+        cur <<= 1;
+        n >>= 1;
+    }
+    return res;
+}
+
+void solve() {
+    ll n; cin >> n;
+    int k = 64;
+    for(int mask = 0; mask < (1 << 15); mask++) {
+        ll sum = 0;
+        int cnt = 0;
+        FOR(i, 0, 16) {
+            if(bit(mask, i)) {
+                sum += fact[i];
+                cnt++;
+            }
+        }
+        cnt += __builtin_popcountll(n - sum);
+        minimize(k, cnt);
+    }
+
+    cout << k << nl;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,23 +127,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll ans = LLONG_MAX;
-    for(int mask = 0; mask < (1 << n); mask++) {
-        ll group1 = 0, group2 = 0;
-        FOR(i, 1, n + 1) {
-            if(bit(mask, i - 1)) {
-                group1 += A[i];
-            } else {
-                group2 += A[i];
-            }
-        }
-        minimize(ans, abs(group1 - group2));
+    fact[0] = 1;
+    FOR(i, 1, 16) { // 15
+        fact[i] = fact[i - 1] * i;
     }
-    cout << ans;
+
+    int t; cin >> t;
+    while(t--) {
+        solve();
+    }
+
 
     return (0 ^ 0);
 
