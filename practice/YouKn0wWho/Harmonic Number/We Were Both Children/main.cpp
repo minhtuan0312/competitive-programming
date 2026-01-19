@@ -86,12 +86,30 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 2e5 + 5;
+int freq[limN], cnt[limN];
+
 void solve() {
-    ll l, r; cin >> l >> r;
-    ll x = l;
-    ll y=  2*l;
-    if(y > r) return cout << -1 << ' ' << -1 << nl, void();
-    else return cout << x << ' ' << y << nl, void();
+    int n; cin >> n;
+    int A[n];
+    memset(freq, 0, sizeof freq);
+    memset(cnt, 0, sizeof cnt);
+    FOR(i, 0, n) {
+        cin >> A[i];
+        if(A[i] > n) continue;
+        freq[A[i]]++;
+    }
+    FOR(i, 1, n + 1) {
+        for(int j = i; j <= n; j += i) {
+            cnt[j] += freq[i];
+        }
+    }
+    int res = 0;
+    FOR(i, 1, n + 1) {
+        maximize(res, cnt[i]);
+    }
+    cout << res << nl;
+
 }
 
 int main(void) {
@@ -102,8 +120,6 @@ int main(void) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
-
-
 
     int t; cin >> t;
     while(t--) {

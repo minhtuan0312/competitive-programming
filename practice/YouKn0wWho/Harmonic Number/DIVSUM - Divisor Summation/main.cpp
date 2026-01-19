@@ -86,12 +86,12 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 500000 + 5;
+ll d[limN];
+
 void solve() {
-    ll l, r; cin >> l >> r;
-    ll x = l;
-    ll y=  2*l;
-    if(y > r) return cout << -1 << ' ' << -1 << nl, void();
-    else return cout << x << ' ' << y << nl, void();
+    ll n; cin >> n;
+    cout << d[n] - n << nl;
 }
 
 int main(void) {
@@ -103,7 +103,13 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-
+    int sq = sqrt(limN);
+    memset(d, 0, sizeof d);
+    for(int i = 1; i < limN; i++) {
+        for(int j = i; j < limN; j += i) {
+            d[j] += i;
+        }
+    }
 
     int t; cin >> t;
     while(t--) {

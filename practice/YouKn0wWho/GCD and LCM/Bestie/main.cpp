@@ -86,12 +86,25 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+// gcd(n, A[n]) = u -> u | n
+// gcd(n - 1, A[n - 1]) = v -> v | (n - 1)
+// gcd(u, v) | gcd(n, n - 1) = 1
+
 void solve() {
-    ll l, r; cin >> l >> r;
-    ll x = l;
-    ll y=  2*l;
-    if(y > r) return cout << -1 << ' ' << -1 << nl, void();
-    else return cout << x << ' ' << y << nl, void();
+    int n; cin >> n;
+    int A[n + 1];
+    int cur;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        if(i == 1) cur = A[i];
+        else cur = __gcd(cur, A[i]);
+    }
+
+    if(cur == 1) return cout << 0 << nl, void();
+    if(__gcd(cur, n) == 1) return cout << 1 << nl, void();
+    if(__gcd(cur, n - 1) == 1) return cout << 2 << nl, void();
+    return cout << 3 << nl, void();
+
 }
 
 int main(void) {
@@ -102,8 +115,6 @@ int main(void) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
-
-
 
     int t; cin >> t;
     while(t--) {
