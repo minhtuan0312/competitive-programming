@@ -86,13 +86,8 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
-}
+const int limN = 1e6 + 5;
+int cnt[limN];
 
 int main(void) {
     minhtuan0312;
@@ -103,9 +98,17 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
+    memset(cnt, 0, sizeof cnt);
+    FOR(i, 1, limN) {
+        for(int j = i; j < limN; j += i) {
+            cnt[j]++;
+        }
+    }
+
     int t; cin >> t;
     while(t--) {
-        solve();
+        int a, b; cin >> a >> b;
+        cout << cnt[__gcd(a, b)] << nl;
     }
 
     return (0 ^ 0);

@@ -86,12 +86,26 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 1e6 + 5;
+int A[limN], B[limN];
 void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
+    int n; cin >> n;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+    int mxa = 0, mxb = 0;
+    FOR(i, 1, n + 1) {
+        if(A[i] < B[i]) {
+            swap(A[i], B[i]);
+        }
+        maximize(mxa, A[i]);
+        maximize(mxb, B[i]);
+    }
+    cout << 1ll * mxa * mxb << nl;
+
 }
 
 int main(void) {

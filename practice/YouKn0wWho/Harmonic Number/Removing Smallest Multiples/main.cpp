@@ -86,12 +86,29 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 1e6 + 5;
+bool mark[limN], visited[limN];
+
 void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
+    memset(mark, 0, sizeof mark);
+    memset(visited, 0, sizeof visited);
+    int n; cin >> n;
+    string s; cin >> s;
+    s = ' ' + s;
+    FOR(i, 1, n + 1) {
+        mark[i] = (s[i] == '1');
+    }
+    ll cost = 0;
+    FOR(i, 1, n + 1) {
+        for(int j = i; j <= n; j += i) {
+            if(mark[j]) break;
+            if(!visited[j]) {
+                visited[j] = 1;
+                cost += i;
+            }
+        }
+    }
+    cout << cost << nl;
 }
 
 int main(void) {

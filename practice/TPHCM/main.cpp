@@ -86,14 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -103,10 +95,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    ll n, p, a, b, r; cin >> n >> p >> a >> b >> r;
+    cout << min({(p - r) / (n + a), (p - r) / (n + b), (p - r) / (n + a + b)});
 
     return (0 ^ 0);
 

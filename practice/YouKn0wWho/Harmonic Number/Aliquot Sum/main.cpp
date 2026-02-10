@@ -86,13 +86,8 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
-}
+const int limN = 1e6 + 5;
+int aliquot[limN];
 
 int main(void) {
     minhtuan0312;
@@ -103,9 +98,19 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
+    memset(aliquot, 0, sizeof aliquot);
+    for(int i = 1; i * 2 < limN; i++) {
+        for(int j = i + i; j < limN; j += i) {
+            aliquot[j] += i;
+        }
+    }
+
     int t; cin >> t;
     while(t--) {
-        solve();
+        int n; cin >> n;
+        if(aliquot[n] > n) cout << "abundant" << nl;
+        else if(aliquot[n] < n) cout << "deficient" << nl;
+        else cout << "perfect" << nl;
     }
 
     return (0 ^ 0);

@@ -86,14 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -103,10 +95,32 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    ll n, m; cin >> n >> m;
+    ll A[n + 1], roll[(n << 1) + 5];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
     }
+    sort(A + 1, A + 1 + n);
+    FOR(i, 1, n + 1) {
+        roll[i] = A[i];
+        roll[i + n] = A[i] + m;
+    }
+    ll pre[(n << 1) + 5];
+    pre[0] = 0;
+    FOR(i, 1, (n << 1) + 1) {
+        pre[i] = pre[i - 1] + roll[i];
+    }
+    ll best = LLONG_MAX;
+    FOR(i, 1, n + 1) {
+        int l = i;
+        int r = l + n - 1;
+        int mid = (l + r) >> 1;
+
+        ll cost_l = 1ll * (mid - l) * roll[mid] - (pre[mid - 1] - pre[l - 1]);
+        ll cost_r = pre[r] - pre[mid] - 1ll * (r - mid) * roll[mid];
+        minimize(best, cost_l + cost_r);
+    }
+    cout << best;
 
     return (0 ^ 0);
 

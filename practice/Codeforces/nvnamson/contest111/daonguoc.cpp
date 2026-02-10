@@ -86,12 +86,28 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 1e6 + 5;
+int A[limN], mark[limN];
 void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
+    int n; cin >> n;
+    memset(mark, 0, sizeof mark);
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        mark[A[i]] = i;
+    }
+    int l = -1, r = -1;
+    FOR(i, 1, n + 1) {
+        if(A[i] != i) {
+            l = i;
+            r = mark[i];
+            break;
+        }
+    }
+    reverse(A + l, A + r + 1);
+    FOR(i, 1, n + 1) {
+        cout << A[i] << ' ';
+    }
+    cout << nl;
 }
 
 int main(void) {

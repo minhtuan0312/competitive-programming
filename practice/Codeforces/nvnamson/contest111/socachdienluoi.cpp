@@ -86,12 +86,15 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    ll a, b; cin >> a >> b;
-    ll g = llabs(a - b);
-    if (g == 0) return cout << 0 << ' ' << 0 << nl, void();
-    ll r = a % g;
-    cout << g << ' ' << min(r, (-r + g) % g) << nl;
+ll bin_pow(ll a, ll b, ll m) {
+    ll res = 1;
+    a = a % m;
+    while(b) {
+        if (b & 1) res = res * a % m;
+        a = a * a % m;
+        b >>= 1;
+    }
+    return res;
 }
 
 int main(void) {
@@ -103,10 +106,38 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    ll C[251][251];
+    C[0][0] = 1;
+    FOR(n, 1, 251) {
+        C[n][0] = 1;
+        FOR(k, 1, 251) {
+            C[n][k] = C[n - 1][k] + C[n - 1][k - 1];
+            C[n][k] %= mod;
+        }
     }
+
+    ll n, k; cin >> n >> k;
+    ll res = 0;
+    FOR(i, 0, n + 1) {
+        ll calc = C[n][i] % mod;
+        calc = calc * bin_pow(k - 1, n * i, mod) % mod;
+
+        ll inner = bin_pow(k, n - i, mod);
+        inner -= bin_pow(k - 1 , n - i, mod);
+        inner += mod;
+        inner %= mod;
+        calc = calc * bin_pow(inner, n, mod) % mod;
+        if(i & 1) {
+            res -= calc;
+            res += mod;
+            res %= mod;
+        } else {
+            res += calc;
+            res %= mod;
+        }
+    }
+    cout << res;
+
 
     return (0 ^ 0);
 

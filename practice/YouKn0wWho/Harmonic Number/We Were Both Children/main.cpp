@@ -87,14 +87,12 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 const int limN = 2e5 + 5;
-int freq[limN], cnt[limN];
-
+int A[limN], freq[limN], cnt[limN];
 void solve() {
     int n; cin >> n;
-    int A[n];
-    memset(freq, 0, sizeof freq);
+    memset(freq, 0, sizeof cnt);
     memset(cnt, 0, sizeof cnt);
-    FOR(i, 0, n) {
+    FOR(i, 1, n + 1) {
         cin >> A[i];
         if(A[i] > n) continue;
         freq[A[i]]++;
@@ -109,7 +107,6 @@ void solve() {
         maximize(res, cnt[i]);
     }
     cout << res << nl;
-
 }
 
 int main(void) {
