@@ -86,38 +86,8 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
-
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
-}
+const int limN = 2e5 + 5;
+int dist[limN];
 
 int main(void) {
     minhtuan0312;
@@ -128,9 +98,25 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    int n, m; cin >> n >> m;
+
+    memset(dist, -1, sizeof dist);
+    queue<int> qu;
+    qu.push(n);
+    dist[n] = 0;
+    while(!qu.empty()) {
+        int u = qu.front(); qu.pop();
+        if(u == m) {
+            return cout << dist[u], 0;
+        }
+        if((u << 1) < limN && dist[u << 1] == -1) {
+            dist[u << 1] = dist[u] + 1;
+            qu.push(u << 1);
+        }
+        if(u - 1 >= 0 && dist[u - 1] == -1) {
+            dist[u - 1] = dist[u] + 1;
+            qu.push(u - 1);
+        }
     }
 
     return (0 ^ 0);

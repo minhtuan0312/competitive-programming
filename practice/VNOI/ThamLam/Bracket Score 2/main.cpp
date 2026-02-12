@@ -95,8 +95,7 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, p, a, b, r; cin >> n >> p >> a >> b >> r;
-    cout << min({(p - r) / (n + a), (p - r) / (n + b), (p - r) / (n + a + b)});
+
 
     return (0 ^ 0);
 

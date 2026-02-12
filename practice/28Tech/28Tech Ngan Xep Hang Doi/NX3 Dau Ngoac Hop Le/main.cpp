@@ -86,37 +86,22 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+bool isValid(const char &x, const char &y) {
+    return (x == '(' && y == ')') || (x == '{' && y == '}') || (x == '[' && y == ']');
+}
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
+inline bool check(const string &s) {
+    stack<char> st;
+    for(const char &c: s) {
+        if(c == '(' || c == '{' || c == '[') {
+            st.push(c);
+        } else {
+            if(st.empty()) return 0;
+            char v = st.top(); st.pop();
+            if(!isValid(v, c)) return 0;
         }
     }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
+    return st.empty();
 }
 
 int main(void) {
@@ -128,10 +113,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    string s; cin >> s;
+    cout << (check(s)? "YES": "NO");
 
     return (0 ^ 0);
 

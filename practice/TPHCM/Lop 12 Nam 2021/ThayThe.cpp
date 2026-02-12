@@ -86,36 +86,41 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+typedef pair<int, int> ii;
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
+int solve(int n, int p, int a, int b, int r) {
 
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
+    queue<ii> qu;
+    qu.push({n, 0});
+    set<int> s;
+    s.insert(n);
+    while(!qu.empty()) {
+
+        ii u = qu.front(); qu.pop();
+        if(u.fi == r) {
+            return u.se;
         }
+        int OP_A = (u.fi + a) % p;
+        if(s.count(OP_A) == 0) {
+            qu.push({OP_A, u.se + 1});
+            s.insert(OP_A);
+        }
+
+        int OP_B = (u.fi + b) % p;
+        if(s.count(OP_B) == 0) {
+            qu.push({OP_B, u.se + 1});
+            s.insert(OP_B);
+        }
+
+        int OP_C = (u.fi + a + b) % p;
+        if(s.count(OP_C) == 0) {
+            qu.push({OP_C, u.se + 1});
+            s.insert(OP_C);
+        }
+
     }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
 
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
+    return -1;
 
 }
 
@@ -128,10 +133,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    int n, p, a, b, r; cin >> n >> p >> a >> b >> r;
+    cout << solve(n, p, a, b, r);
 
     return (0 ^ 0);
 

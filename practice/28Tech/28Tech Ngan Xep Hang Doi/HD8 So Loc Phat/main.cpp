@@ -86,37 +86,19 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+vector<string> v;
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
+void init() {
+    queue<string> qu;
+    qu.push("6");
+    qu.push("8");
+    while(!qu.empty()) {
+        string u = qu.front(); qu.pop();
+        if(sz(u) == 6) break;
+        v.pb(u);
+        qu.push(u + "6");
+        qu.push(u + "8");
     }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
 }
 
 int main(void) {
@@ -128,10 +110,9 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    init();
+
+    deb(v);
 
     return (0 ^ 0);
 

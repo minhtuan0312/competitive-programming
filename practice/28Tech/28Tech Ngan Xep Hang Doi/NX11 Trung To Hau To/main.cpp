@@ -86,37 +86,35 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+inline bool priority(const char &c) {
+    if(c == '-' || c == '+') return 1;
+    if(c == '*' || c == '/') return 2;
+    if(c == '^') return 3;
+    return 0;
+}
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
+void solve(const string &s) {
+    string res;
+    stack<char> st;
+    for(const char &c: s) {
+        if(isalpha(c)) res += c;
+        else if (c == '(') st.push(c);
+        else if (c == ')') {
+            while(!st.empty() && st.top() != '(') {
+                res += st.top(); st.pop();
             }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
+            st.pop();
+        } else {
+            while(!st.empty() && (priority(c) < priority(st.top()) || (priority(c) == priority(st.top()) && c != '^'))) {
+                res += st.top(); st.pop();
+            }
+            st.push(c);
         }
     }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
+    while(!st.empty()) {
+            res += st.top(); st.pop();
+        }
+    cout << res;
 }
 
 int main(void) {
@@ -128,10 +126,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    string s; cin >> s;
+    solve(s);
 
     return (0 ^ 0);
 

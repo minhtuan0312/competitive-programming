@@ -86,38 +86,7 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
-
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
-}
+typedef pair<int, int> ii;
 
 int main(void) {
     minhtuan0312;
@@ -128,11 +97,23 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    int n; cin >> n;
+    ii A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].fi >> A[i].se;
     }
-
+    sort(A + 1, A + 1 + n, [&] (const ii &a, const ii &b) {
+        return a.se < b.se;
+        });
+    int res = 1;
+    int cur = A[1].se;
+    FOR(i, 2, n + 1) {
+        if(A[i].fi >= cur) {
+            cur = A[i].se;
+            res++;
+        }
+    }
+    cout << res;
     return (0 ^ 0);
 
 }

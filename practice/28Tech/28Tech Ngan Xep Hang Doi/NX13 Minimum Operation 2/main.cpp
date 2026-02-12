@@ -86,36 +86,33 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+const int limN = 1e9 + 5;
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
+typedef pair<int, int> ii;
 
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
+int solve(ll n) {
+
+    queue<ii> qu;
+    qu.push({n, 0});
+    unordered_set<int> s;
+    s.insert(n);
+    while(!qu.empty()) {
+        ii u = qu.front(); qu.pop();
+        if(u.fi == 1) return u.se;
+        if(u.fi - 1 > 0 && s.count(u.fi - 1) == 0) {
+            qu.push({u.fi - 1, u.se + 1});
+            s.insert(u.fi - 1);
         }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
+        for(ll i = 2; i * i <= u.fi; i++) {
+            if(u.fi % i == 0) {
+                ll tmp = max(i, u.fi / i);
+                if(s.count(tmp) == 0) {
+                    qu.push({tmp, u.se + 1});
+                    s.insert(tmp);
+                }
             }
         }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
     }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
 
 }
 
@@ -130,7 +127,8 @@ int main(void) {
 
     int t; cin >> t;
     while(t--) {
-        solve();
+        int n; cin >> n;
+        cout << solve(n) << nl;
     }
 
     return (0 ^ 0);

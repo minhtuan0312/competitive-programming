@@ -86,37 +86,21 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
-
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
+void solve(string s) {
+    int n = sz(s);
     s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
+    stack<string> st;
+    for(int i = n; i >= 1; i--) {
+        if(isalpha(s[i])) {
+            st.push(string(1, s[i]));
+        } else {
+            string x = st.top(); st.pop();
+            string y = st.top(); st.pop();
+            string xy = "(" + x + s[i] + y + ")";
+            st.push(xy);
         }
     }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
+    cout << st.top();
 }
 
 int main(void) {
@@ -128,10 +112,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
-    }
+    string s; cin >> s;
+    solve(s);
 
     return (0 ^ 0);
 

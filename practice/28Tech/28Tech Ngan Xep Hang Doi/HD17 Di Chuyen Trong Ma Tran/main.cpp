@@ -86,36 +86,44 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
+const int limN = 2e3 + 5;
+int dist[limN][limN];
 
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
+typedef pair<int, int> ii;
 
-    bool ok = 1;
+int solve() {
+
+    memset(dist, -1, sizeof dist);
+    int n, m; cin >> n >> m;
+    int A[n + 1][m + 1];
     FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
+        FOR(j, 1, m + 1) {
+            cin >> A[i][j];
         }
     }
 
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
+    queue<ii> qu;
+    qu.push({1, 1});
+    dist[1][1] = 0;
+    while(!qu.empty()) {
+
+        ii u = qu.front(); qu.pop();
+        if(u.fi == n && u.se == m) {
+            return dist[u.fi][u.se];
+        }
+        int nx = u.fi + A[u.fi][u.se];
+        if(nx <= n && dist[nx][u.se] == -1) {
+            dist[nx][u.se] = dist[u.fi][u.se] + 1;
+            qu.push({nx, u.se});
+        }
+        int ny = u.se + A[u.fi][u.se];
+        if(ny <= m && dist[u.fi][ny] == -1) {
+            dist[u.fi][ny] = dist[u.fi][u.se] + 1;
+            qu.push({u.fi, ny});
+        }
+    }
+
+    return -1;
 
 }
 
@@ -130,7 +138,7 @@ int main(void) {
 
     int t; cin >> t;
     while(t--) {
-        solve();
+        cout << solve() << nl;
     }
 
     return (0 ^ 0);

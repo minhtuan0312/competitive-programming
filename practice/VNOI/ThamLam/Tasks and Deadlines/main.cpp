@@ -86,38 +86,9 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 3e5 + 5;
-void solve() {
-
-    int n; cin >> n;
-    char c; cin >> c;
-    string s; cin >> s;
-    s = ' ' + s;
-
-    bool ok = 1;
-    FOR(i, 1, n + 1) {
-        if(s[i] != c) {
-            ok = 0;
-            break;
-        }
-    }
-    if(ok) return cout << 0 << nl, void();
-    FOR(i, 1, n + 1) {
-        bool ok = 1;
-        for(int j = i; j <= n; j += i) {
-            if(s[j] != c) {
-                ok = 0;
-                break;
-            }
-        }
-        if(ok) {
-            return cout << 1 << nl << i << nl, void();
-        }
-    }
-
-    cout << 2 << nl << n - 1 << ' ' << n << nl;
-
-}
+struct task {
+    int duration, deadline;
+};
 
 int main(void) {
     minhtuan0312;
@@ -128,10 +99,23 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    int n; cin >> n;
+    task A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].duration >> A[i].deadline;
     }
+
+    sort(A + 1, A + 1 + n, [&] (const task &x, const task &y) {
+         return x.duration < y.duration;
+         });
+
+    ll res = 0;
+    ll time = 0;
+    FOR(i, 1, n + 1) {
+        time += A[i].duration;
+        res += A[i].deadline - time;
+    }
+    cout << res;
 
     return (0 ^ 0);
 
