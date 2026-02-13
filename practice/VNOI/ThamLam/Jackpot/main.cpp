@@ -86,6 +86,31 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<int, int> ii;
+void solve() {
+    int n; cin >> n;
+    int A[n << 1 | 1], id[n << 1 | 1];
+    FOR(i, 1, (n << 1 | 1)) {
+        cin >> A[i];
+    }
+    sort(A + 1, A + 1 + (n << 1));
+    FOR(i, 1, (n << 1 | 1)) {
+        if(i <= n) id[i] = 0;
+        else id[i] = 1;
+    }
+    stack<ii> st;
+    ll res = 0;
+    FOR(i, 1, (n << 1 | 1)) {
+        if(st.empty() || st.top().fi == id[i]) {
+            st.push({id[i], A[i]});
+        } else {
+            res += abs(st.top().se - A[i]);
+            st.pop();
+        }
+    }
+    cout << res << nl;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +120,10 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
 
     return (0 ^ 0);
 

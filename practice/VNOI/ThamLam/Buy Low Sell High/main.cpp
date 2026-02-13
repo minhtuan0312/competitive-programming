@@ -96,21 +96,17 @@ int main(void) {
     }
 
     int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int A[n + 1];
+    priority_queue<int, vector<int>, greater<int>> pq;
+    ll res = 0;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        pq.push(A[i]); // buy
+        pq.push(A[i]); // sell
+        int u = pq.top(); pq.pop();
+        res += (A[i] - u);
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
+    cout << res;
 
     return (0 ^ 0);
 

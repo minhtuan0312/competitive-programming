@@ -86,6 +86,12 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct sct {
+    ll w, v;
+};
+
+typedef pair<ll, ll> ii;
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +101,52 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int n, maxw; cin >> n >> maxw;
+    sct A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].w >> A[i].v;
     }
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    int n1 = n >> 1;
+    int n2 = n - n1;
+    vector<ii> v1, v2;
+    FOR(mask, 0, (1 << n1)) {
+        ll v = 0, w = 0;
+        FOR(i, 1, n1 + 1) {
+            if(bit(mask, i - 1)) {
+                w += A[i].w;
+                v += A[i].v;
+            }
+        }
+        if(w <= maxw) v1.eb(w, v);
+    }
+    FOR(mask, 0, (1 << n2)) {
+        ll v = 0, w = 0;
+        FOR(i, 1, n2 + 1) {
+            if(bit(mask, i - 1)) {
+                w += A[n1 + i].w;
+                v += A[n1 + i].v;
+            }
+        }
+        if(w <= maxw) v2.eb(w, v);
+    }
+
+    sort(all(v2));
+    FOR(i, 1, sz(v2)) {
+        maximize(v2[i].se, v2[i - 1].se);
+    }
+
+    ll res = 0;
+    for(const auto &[w, v]: v1) {
+
+        ll remainder = maxw - w;
+        if(remainder < 0) continue;
+        auto it = upper_bound(all(v2), make_pair(remainder, LLONG_MAX));
+        if(it != v2.begin())
+            maximize(res, v + prev(it)->se);
+
+    }
+    cout << res;
 
     return (0 ^ 0);
 

@@ -95,22 +95,25 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int n, x; cin >> n >> x;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
+    unordered_map<int, pair<int, int>> counter;
+    FOR(i, 1, n + 1) {
+        FOR(j, i + 1, n + 1) {
+            ll target = x - A[i] - A[j];
+            if(counter.count(target)) {
+                cout << counter[target].fi << ' ' << counter[target].se << ' ' << i << ' ' << j;
+                return 0;
+            }
+        }
+        FOR(k, 1, i) {
+            counter[A[i] + A[k]] = {k, i};
+        }
+    }
+    cout << "IMPOSSIBLE";
 
     return (0 ^ 0);
 

@@ -96,21 +96,43 @@ int main(void) {
     }
 
     int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
     }
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    int n1 = n >> 1;
+    int n2 = n - n1;
+    vector<ll> v1, v2;
+    FOR(mask, 0, (1 << n1)) {
+        ll sum = 0;
+        FOR(i, 1, n1 + 1) {
+            if(bit(mask, i - 1)) {
+                sum += A[i];
+            }
+        }
+        v1.eb(sum);
+    }
+    FOR(mask, 0, (1 << n2)) {
+        ll sum = 0;
+        FOR(i, 1, n2 + 1) {
+            if(bit(mask, i - 1)) {
+                sum += A[n1 + i];
+            }
+        }
+        v2.eb(sum);
+    }
+
+    sort(all(v2));
+
+    ll res = 0;
+    for(const auto &x: v1) {
+        if(binary_search(all(v2), x)) {
+            maximize(res, x);
+        }
+    }
+    cout << res;
+
 
     return (0 ^ 0);
 

@@ -86,6 +86,27 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+void solve() {
+
+    ll n; cin >> n;
+
+    ll start = 1;
+    ll len = 1;
+    ll cnt = 9;
+
+    while(n > len * cnt) {
+        n -= len * cnt;
+        len++;
+        cnt *= 10;
+        start *= 10;
+    }
+
+    ll target = start + (n - 1) / len;
+    string s = to_string(target);
+    cout << s[(n - 1) % len] << nl;
+
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +116,10 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
 
     return (0 ^ 0);
 

@@ -96,21 +96,21 @@ int main(void) {
     }
 
     int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
     }
+    sort(A + 1, A + 1 + n);
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    ll s = 0;
+    FOR(i, 1, n + 1) {
+        if(A[i] - s <= 1) {
+            s += A[i];
+        } else {
+            return cout << s + 1, 0;
+        }
+    }
+    cout << s + 1;
 
     return (0 ^ 0);
 

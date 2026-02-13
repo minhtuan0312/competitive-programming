@@ -86,6 +86,50 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<int, int> ii;
+void solve() {
+
+    int n, x; cin >> n >> x;
+    ii A[n + 1];
+    int B[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].fi;
+        A[i].se = i;
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+    sort(A + 1, A + 1 + n);
+    sort(B + 1, B + 1 + n);
+
+    int res[n + 1];
+    FOR(i, 1, x + 1) {
+        res[A[n - x + i].second] = B[i];
+    }
+    FOR(i, 1, n - x + 1) {
+        res[A[i].second] = B[x + i];
+    }
+
+    int ogA[n + 1];
+    FOR(i, 1, n + 1){
+        ogA[A[i].se] = A[i].fi;
+    }
+
+    int cnt = 0;
+    FOR(i, 1, n + 1) {
+        if(ogA[i] > res[i])cnt++;
+    }
+
+    if(cnt == x) {
+        cout << "YES" << nl;
+        FOR(i, 1, n + 1) {
+            cout << res[i] << ' ';
+        }
+        cout << nl;
+    } else cout << "NO" << nl;
+
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +139,10 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
 
     return (0 ^ 0);
 

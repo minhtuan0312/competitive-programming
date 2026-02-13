@@ -86,6 +86,29 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+void solve() {
+
+    int n; cin >> n;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+
+    priority_queue<int> pq;
+    ll cur = 0;
+    FOR(i, 1, n + 1) {
+        cur += A[i];
+        cur -= 2ll * A[i];
+        pq.push(A[i]);
+        if(cur <= 0) {
+            int guilty = pq.top(); pq.pop();
+            cur += 2ll*guilty;
+        }
+    }
+    cout << sz(pq) << nl;
+
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +118,10 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-
-    ll target = start + (n - 1) / len;
-    cout << target;
 
     return (0 ^ 0);
 

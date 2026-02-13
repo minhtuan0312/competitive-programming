@@ -86,6 +86,40 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 505;
+typedef pair<ll, pair<int, int>> iii;
+
+int dx[4] = {0, 0, -1, 1};
+int dy[4] = {1, -1, 0, 0};
+ll A[limN][limN], dist[limN][limN];
+int n;
+void dijkstra(int s, int t) {
+
+    memset(dist, 0x3f, sizeof dist);
+    priority_queue<iii, vector<iii>, greater<iii>> pq;
+    pq.push({0, {s, t}});
+    dist[s][t] = 0;
+    while(!pq.empty()) {
+        iii u = pq.top(); pq.pop();
+        ll d = u.fi;
+        auto [x, y] = u.se;
+        if(d > dist[x][y]) continue;
+        FOR(k, 0, 4) {
+            int nx = x + dx[k];
+            int ny = y + dy[k];
+            if(nx > 0 && ny > 0 && nx <= n && ny <= n) {
+                // relax
+                ll nd = max(dist[x][y], abs(A[nx][ny] - A[x][y]));
+                if(dist[nx][ny] > nd) {
+                    dist[nx][ny] = nd;
+                    pq.push({nd, {nx, ny}});
+                }
+            }
+        }
+    }
+
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +129,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    cin >> n;
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, n + 1) {
+            cin >> A[i][j];
+        }
     }
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    dijkstra(1, 1);
+
+    cout << dist[n][n];
 
     return (0 ^ 0);
 

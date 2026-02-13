@@ -86,6 +86,8 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<int, int> ii;
+
 int main(void) {
     minhtuan0312;
 
@@ -95,6 +97,34 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
+    int n; cin >> n;
+    int A[n << 1 | 1], id[n << 1 | 1];
+    vector<ii> tmp;
+    FOR(i, 1, (n << 1 | 1)) {
+        cin >> A[i];
+        tmp.eb(A[i], i);
+    }
+    sort(all(tmp));
+    FOR(i, 0, (n << 1)) {
+        if(i <= n - 1) {
+            id[tmp[i].se] = 0;
+        } else {
+            id[tmp[i].se] = 1;
+        }
+    }
+
+    stack<int> st;
+    string res = "";
+    FOR(i, 1, (n << 1 | 1)) {
+        if(st.empty() || st.top() == id[i]) {
+            res += '(';
+            st.push(id[i]);
+        } else if(!st.empty() && st.top() != id[i]){
+            res += ')';
+            st.pop();
+        }
+    }
+    cout << res;
 
 
     return (0 ^ 0);

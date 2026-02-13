@@ -86,6 +86,25 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct fenwick_tree{
+    int n;
+    vector<ll> BIT;
+    fenwick_tree() {}
+    fenwick_tree(int n): n(n), BIT(n + 1) {}
+    void upd(int idx, ll val) {
+        for(; idx <= n; idx += (idx & -idx)) {
+            BIT[idx] += val;
+        }
+    }
+    ll query(int idx) {
+        ll res = 0;
+        for(; idx >= 1; idx -= (idx & -idx)) {
+            res += BIT[idx];
+        }
+        return res;
+    }
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -96,21 +115,32 @@ int main(void) {
     }
 
     int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int A[n + 1];
+    vector<int> compress;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        compress.eb(A[i]);
+    }
+    sort(all(compress));
+    FOR(i, 1, n + 1) {
+        A[i] = lower_bound(all(compress), A[i]) - compress.begin() + 1;
     }
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    fenwick_tree vl(n), vr(n);
+    FOR(i, 1, n + 1) {
+        vr.upd(A[i], 1);
+    }
+    ll res = 0;
+    FOR(j, 1, n + 1) {
+        vr.upd(A[j], -1);
+        if(j > 1 && j < n) {
+            ll left = vl.query(A[j] - 1);
+            ll right = vr.query(n) - vr.query(A[j]);
+            res += left * right;
+        }
+        vl.upd(A[j], 1);
+    }
+    cout << res;
 
     return (0 ^ 0);
 

@@ -86,6 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct sct {
+    int A, B;
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,22 +99,24 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-
-    n += 3;
-
-    ll start = 1;
-    ll len = 1;
-    ll cnt = 9;
-    while(n > len * cnt) {
-        n -= len * cnt;
-        len++;
-        start *= 10;
-        cnt *= 10;
+    int n, k; cin >> n >> k;
+    sct f[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> f[i].A >> f[i].B;
     }
+    sort(f + 1, f + 1 + n, [&](const sct &i, const sct &j) {
+         return i.B * (j.A - 1) > j.B * (i.A - 1);
+         });
 
-    ll target = start + (n - 1) / len;
-    cout << target;
+    vector<ll> dp(k + 1, LLONG_MIN);
+    dp[0] = 1;
+    FOR(i, 1, n + 1) {
+        for(int j = k; j >= 1; j--) {
+            if(dp[j - 1] != LLONG_MIN)
+                maximize(dp[j], f[i].A * dp[j - 1] + f[i].B);
+        }
+    }
+    cout << dp[k];
 
     return (0 ^ 0);
 
