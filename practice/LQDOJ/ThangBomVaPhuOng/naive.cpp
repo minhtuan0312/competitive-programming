@@ -23,8 +23,11 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) {
+        return x = y, 1;;
+    }
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,11 +89,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-int A[n + 1];
-
-void Try(int idx, )
-
 int main(void) {
     minhtuan0312;
 
@@ -100,10 +98,45 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
+    int n, k; cin >> n >> k;
+    ll sum = 0;
+    ll A[n + 2];
     FOR(i, 1, n + 1) {
         cin >> A[i];
+        sum += A[i];
     }
+    A[n + 1] = 0;
+
+    ll dp[n + 2];
+    ll trace[n + 2];
+    memset(dp, 0x3f, sizeof dp);
+    memset(trace, -1, sizeof trace);
+    dp[0] = 0;
+    FOR(i, 1, n + 2) {
+        FOR(j, max(i - k, 0), i) {
+            if(minimize(dp[i], dp[j] + A[i])) {
+                trace[i] = j;
+            }
+        }
+    }
+
+    vector<int> res;
+
+    bool skipped[n + 2] = {0};
+    int last_idx = n + 1;
+    while(last_idx != -1) {
+        skipped[last_idx] = 1;
+        last_idx = trace[last_idx];
+    }
+
+    FOR(i, 1, n + 1) {
+        if(!skipped[i]) {
+            res.eb(i);
+        }
+    }
+
+    cout << sz(res) << ' ' << sum - dp[n + 1] << nl;
+    for(const auto &x: res) cout << x << ' ';
 
 
     return (0 ^ 0);

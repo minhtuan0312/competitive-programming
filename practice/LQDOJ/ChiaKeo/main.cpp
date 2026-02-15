@@ -87,24 +87,98 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 int n;
-int A[n + 1];
+namespace sub12 {
+    inline bool check() {
+        return n <= 40;
+    }
+    void solve() {
 
-void Try(int idx, )
+        ll A[n + 1];
+        ll s = 0;
+        FOR(i, 1, n + 1){
+            cin >> A[i];
+            s += A[i];
+        }
+
+        int n1 = n >> 1;
+        int n2 = n - n1;
+        vector<ll> v1, v2;
+        FOR(mask, 0, (1 << n1)) {
+            ll sum = 0;
+            FOR(i, 1, n1 + 1) {
+                if(bit(mask, i - 1)) {
+                    sum += A[i];
+                }
+            }
+            v1.eb(sum);
+        }
+        FOR(mask, 0, (1 << n2)) {
+            ll sum = 0;
+            FOR(i, 1, n2 + 1) {
+                if(bit(mask, i - 1)) {
+                    sum += A[n1 + i];
+                }
+            }
+            v2.eb(sum);
+        }
+        sort(all(v2));
+        ll res = LLONG_MAX;
+        for(const ll &x: v1) {
+            ll target = s / 2 - x;
+            auto it = lower_bound(all(v2), target);
+            if(it != v2.end()) {
+                ll cur = x + *it;
+                minimize(res, abs(cur - (s - cur)));
+            }
+        }
+        cout << res;
+
+    }
+}
+
+namespace sub24 {
+    const ll limSum = 12 * 1e5 + 5;
+    inline bool check() {
+        return  40 < n && n <= 1e4;
+    }
+    void solve() {
+
+        ll A[n + 1];
+        ll s = 0;
+        FOR(i, 1, n + 1){
+            cin >> A[i];
+            s += A[i];
+        }
+
+        ll target = s >> 1;
+        bitset<limSum> dp;
+        dp[0] = 1;
+        FOR(i, 1, n + 1) {
+            if(A[i] <= target) {
+                dp |= (dp << A[i]);
+            }
+        }
+        for(ll x = target; x >= 0; x--) {
+            if(dp[x]) {
+                return cout << abs(x - (s - x)), void();
+            }
+        }
+
+    }
+}
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "CANDY"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
     cin >> n;
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-
+    if(sub12::check()) return sub12::solve(), 0;
+    if(sub24::check()) return sub24::solve(), 0;
 
     return (0 ^ 0);
 

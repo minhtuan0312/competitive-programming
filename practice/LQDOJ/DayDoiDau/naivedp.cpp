@@ -18,8 +18,12 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) {
+        x = y;
+        return 1;
+    }
+    return 0;
 }
 
 template<class T>
@@ -86,10 +90,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-int A[n + 1];
-
-void Try(int idx, )
+struct trace_node{
+    int prev_id;
+    int prev_state;
+};
 
 int main(void) {
     minhtuan0312;
@@ -100,11 +104,53 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
+    int n; cin >> n;
+    int A[n + 1];
     FOR(i, 1, n + 1) {
         cin >> A[i];
     }
 
+    int dp[n + 1][2];
+    trace_node trace[n + 1][2];
+    memset(dp, 0, sizeof dp);
+    memset(trace, -1, sizeof trace);
+
+    int maxi = 0, last_id = 1, last_state = 0;
+    FOR(i, 1, n + 1) dp[i][0] = dp[i][1] = 1;
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, i) {
+            if(A[j] < A[i]) {
+                if(maximize(dp[i][0], dp[j][1] + 1)) {
+                    trace[i][0] = {j, 1};
+                }
+            }
+            else if (A[j] > A[i]) {
+                if(maximize(dp[i][1], dp[j][0] + 1)) {
+                    trace[i][1] = {j, 0};
+                }
+            }
+        }
+        FOR(j, 0, 2) {
+            if(maximize(maxi, dp[i][j])) {
+                last_id = i;
+                last_state = j;
+            }
+        }
+    }
+
+    vector<int> res;
+    while(last_id != -1) {
+        res.eb(A[last_id]);
+        trace_node t = trace[last_id][last_state];
+        last_id = t.prev_id;
+        last_state = t.prev_state;
+    }
+    reverse(all(res));
+
+    cout << sz(res) << nl;
+    for(const auto &x: res) {
+        cout << x << ' ';
+    }
 
     return (0 ^ 0);
 

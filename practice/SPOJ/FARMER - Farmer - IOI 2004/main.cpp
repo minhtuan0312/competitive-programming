@@ -86,11 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-int A[n + 1];
-
-void Try(int idx, )
-
 int main(void) {
     minhtuan0312;
 
@@ -100,11 +95,42 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+    int q, m, k; cin >> q >> m >> k;
+    int fields[m + 1], strips[k + 1];
+    FOR(i, 1, m + 1) cin >> fields[i];
+    FOR(i, 1, k + 1) cin >> strips[i];
+
+    bitset<300005> dp;
+    dp[0] = 1;
+    FOR(i, 1, m + 1) {
+        dp |= (dp << fields[i]);
     }
 
+    sort(strips + 1, strips + 1 + k, greater<int>());
+    ll pre[k + 1];
+    pre[0] = 0;
+    FOR(i, 1, k + 1) {
+        pre[i] = pre[i - 1] + strips[i];
+    }
+
+    int res = 0;
+    FOR(s, 0, q + 1) {
+        if(dp[s]) {
+
+            int rem = q - s;
+            if(rem == 0) {
+                maximize(res, s);
+                continue;
+            }
+            auto it = lower_bound(pre + 1, pre + 1 + k, rem);
+            if(it != pre + 1 + k) {
+                int cnt = it - (pre + 1) + 1;
+                maximize(res, q - cnt);
+            }
+        }
+    }
+
+    cout << res;
 
     return (0 ^ 0);
 
