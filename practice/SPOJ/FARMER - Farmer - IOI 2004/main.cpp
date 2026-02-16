@@ -127,6 +127,7 @@ int main(void) {
                 int cnt = it - (pre + 1) + 1;
                 maximize(res, q - cnt);
             }
+
         }
     }
 

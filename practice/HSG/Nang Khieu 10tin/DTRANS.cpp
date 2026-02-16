@@ -86,32 +86,16 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+
+ll compute(ll n) {
+    ll q = n / 9;
+    ll r = n % 9;
+    return 45 * q + r *(r + 1) / 2;
+}
+
 void solve() {
-
-    string s, t; cin >> s >> t;
-    int n = sz(s), m = sz(t);
-    s = ' ' + s;
-    t = ' ' + t;
-
-    int dp[n + 1][m + 1];
-    memset(dp, 0x3f, sizeof dp);
-    dp[0][0] = 0;
-    FOR(i, 1, n + 1) dp[i][0] = i;
-    FOR(j, 1, m + 1) dp[0][j] = j;
-
-    FOR(i, 1, n + 1) {
-        FOR(j, 1, m + 1) {
-            if(s[i] == t[j]) {
-                minimize(dp[i][j], dp[i - 1][j - 1]);
-            } else {
-                minimize(dp[i][j], dp[i - 1][j - 1] + 1);
-                minimize(dp[i][j], dp[i - 1][j] + 1);
-                minimize(dp[i][j], dp[i][j - 1] + 1);
-            }
-        }
-    }
-    cout << dp[n][m] << nl;
-
+    ll l, r; cin >> l >> r;
+    cout << compute(r) - compute(l - 1) << nl;
 }
 
 int main(void) {

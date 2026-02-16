@@ -86,33 +86,12 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-
-    string s, t; cin >> s >> t;
-    int n = sz(s), m = sz(t);
-    s = ' ' + s;
-    t = ' ' + t;
-
-    int dp[n + 1][m + 1];
-    memset(dp, 0x3f, sizeof dp);
-    dp[0][0] = 0;
-    FOR(i, 1, n + 1) dp[i][0] = i;
-    FOR(j, 1, m + 1) dp[0][j] = j;
-
-    FOR(i, 1, n + 1) {
-        FOR(j, 1, m + 1) {
-            if(s[i] == t[j]) {
-                minimize(dp[i][j], dp[i - 1][j - 1]);
-            } else {
-                minimize(dp[i][j], dp[i - 1][j - 1] + 1);
-                minimize(dp[i][j], dp[i - 1][j] + 1);
-                minimize(dp[i][j], dp[i][j - 1] + 1);
-            }
-        }
+struct sct{
+    int bac, nam;
+    operator <(const sct &other) const {
+        return bac == other.bac ? nam > other.nam : bac < other.bac;
     }
-    cout << dp[n][m] << nl;
-
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -123,10 +102,48 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    int m, n, k; cin >> m >> n >> k;
+    sct A[k + 2];
+    FOR(i, 1, k + 1) {
+        cin >> A[i].bac >> A[i].nam;
     }
+    A[0] = {0, 0};
+    A[k + 1] = {m + 1, n + 1};
+
+    sort(A, A + k + 2, [&](const sct&x, const sct&y) {
+            return x.bac < y.bac;
+    });
+    int p; cin >> p;
+    vector<sct> cand;
+    FOR(i, 1, p + 1) {
+        int u, v; cin >> u >> v;
+        auto it = lower_bound(A, A + k + 2, u, [&](const sct&x, int val) {
+                return x.bac < val;
+        });
+        if(it != A + k + 2) {
+            int idx = it - A;
+            if(A[idx - 1].bac < u && u < A[idx].bac) {
+                if(A[idx - 1].nam < v && v < A[idx].nam) {
+                    cand.pb({u, v});
+                }
+            }
+        }
+    }
+    sort(all(cand));
+    int cand_sz = sz(cand);
+    int dp[cand_sz];
+    vector<int> tails;
+    FOR(i, 0, cand_sz) {
+        int v = cand[i].nam;
+        auto it = lower_bound(all(tails), v);
+        if(it == tails.end()) {
+            tails.eb(v);
+        } else {
+            *it = v;
+        }
+    }
+    cout << sz(tails);
+
 
     return (0 ^ 0);
 

@@ -86,34 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-
-    string s, t; cin >> s >> t;
-    int n = sz(s), m = sz(t);
-    s = ' ' + s;
-    t = ' ' + t;
-
-    int dp[n + 1][m + 1];
-    memset(dp, 0x3f, sizeof dp);
-    dp[0][0] = 0;
-    FOR(i, 1, n + 1) dp[i][0] = i;
-    FOR(j, 1, m + 1) dp[0][j] = j;
-
-    FOR(i, 1, n + 1) {
-        FOR(j, 1, m + 1) {
-            if(s[i] == t[j]) {
-                minimize(dp[i][j], dp[i - 1][j - 1]);
-            } else {
-                minimize(dp[i][j], dp[i - 1][j - 1] + 1);
-                minimize(dp[i][j], dp[i - 1][j] + 1);
-                minimize(dp[i][j], dp[i][j - 1] + 1);
-            }
-        }
-    }
-    cout << dp[n][m] << nl;
-
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -123,10 +95,38 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    string s, t; cin >> s >> t;
+    int n = sz(s), m = sz(t);
+    s = ' ' + s;
+    t = ' ' + t;
+
+    int dp[n + 1][m + 1];
+    memset(dp, 0, sizeof dp);
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, m + 1) {
+            if(s[i] == t[j]) {
+                dp[i][j] = dp[i - 1][j - 1] + 1;
+            } else {
+                dp[i][j] = max(dp[i - 1][j], dp[i][j - 1]);
+            }
+        }
     }
+
+    string res = "";
+    int i = n, j = m;
+    while(i && j) {
+        if(s[i] == t[j]) {
+            res.pb(s[i]);
+            i--, j--;
+        }
+        else if(dp[i - 1][j] >= dp[i][j - 1]) {
+            i--;
+        } else {
+            j--;
+        }
+    }
+    reverse(all(res));
+    cout << res;
 
     return (0 ^ 0);
 

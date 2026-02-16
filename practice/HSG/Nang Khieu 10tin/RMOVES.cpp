@@ -86,32 +86,29 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
+const int limN = 2e7 + 5;
+int fact[limN], inv_fact[limN];
 
-    string s, t; cin >> s >> t;
-    int n = sz(s), m = sz(t);
-    s = ' ' + s;
-    t = ' ' + t;
-
-    int dp[n + 1][m + 1];
-    memset(dp, 0x3f, sizeof dp);
-    dp[0][0] = 0;
-    FOR(i, 1, n + 1) dp[i][0] = i;
-    FOR(j, 1, m + 1) dp[0][j] = j;
-
-    FOR(i, 1, n + 1) {
-        FOR(j, 1, m + 1) {
-            if(s[i] == t[j]) {
-                minimize(dp[i][j], dp[i - 1][j - 1]);
-            } else {
-                minimize(dp[i][j], dp[i - 1][j - 1] + 1);
-                minimize(dp[i][j], dp[i - 1][j] + 1);
-                minimize(dp[i][j], dp[i][j - 1] + 1);
-            }
-        }
+ll bin_pow(ll a, ll b, ll m) {
+    ll res = 1;
+    a = a % m;
+    while(b) {
+        if(b & 1) res = res * a % m;
+        a = a * a % m;
+        b >>= 1;
     }
-    cout << dp[n][m] << nl;
+    return res;
+}
 
+void init() {
+    fact[0] = 1;
+    FOR(i, 1, limN) {
+        fact[i] = fact[i - 1] * i % mod;
+    }
+    inv_fact[limN - 1] = bin_pow(fact[limN - 1], mod - 2, mod);
+    for(ll i = limN - 2; i >= 0; i--) {
+        inv_fact[i] = inv_fact[i + 1] * (i + 1) % mod;
+    }
 }
 
 int main(void) {
@@ -123,10 +120,19 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    init();
+    ll m, n; cin >> m >> n;
+    ll res = 0;
+    FOR(k, 0, min(m - 1, n - 1) + 1) {
+        ll calc = fact[m + n - k - 2];
+        calc = calc * inv_fact[k] % mod;
+        calc = calc * inv_fact[m-k-1] % mod;
+        calc = calc * inv_fact[n-k-1] % mod;
+        res += calc;
+        res %= mod;
     }
+    cout << res;
+
 
     return (0 ^ 0);
 
