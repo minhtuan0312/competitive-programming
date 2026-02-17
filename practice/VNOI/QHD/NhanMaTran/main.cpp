@@ -86,42 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-ll bin_pow(ll a, ll b, ll m) {
-    ll res = 1;
-    a = a % m;
-    while(b) {
-        if(b & 1) res = res * a % m;
-        a = a * a % m;
-        b >>= 1;
-    }
-    return res;
-}
-
-void solve() {
-
-    ll n, m; cin >> n >> m;
-    ll q = n / m;
-    ll r = n % m;
-    ll res = 0;
-    //TH1
-    res += q * (q - 1) / 2;
-    //TH2
-    if(!(m & 1)) {
-        ll tmp = q;
-        ll half = (m >> 1);
-        if(half <= r) tmp++;
-        res += tmp * (tmp - 1) / 2;
-    }
-    //TH3
-    ll cnt = (m - 1) / 2;
-    res += cnt * q * q;
-    res += q * max(0ll, cnt - max(1ll, m - r) + 1);
-    res += q * min(cnt, r);
-    res += max(0ll, min(r, cnt) - max(1ll, m - r) + 1);
-    cout << res << nl;
-
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -131,10 +95,19 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) {
-        solve();
+    ll dp[n + 1][n + 1];
+    memset(dp, 0, sizeof dp);
+
+    FOR(len, 2, n + 1) {
+        FOR(i, 1, n - len + 2) {
+            int j = i + len - 1;
+            dp[i][j] = LLONG_MAX;
+            FOR(k, i, j) {
+                minimize(dp[i][j], dp[i][k] + dp[k + 1][j] + 1ll * A[i - 1] * A[k] * A[j]);
+            }
+        }
     }
+    cout << dp[1][n];
 
     return (0 ^ 0);
 
