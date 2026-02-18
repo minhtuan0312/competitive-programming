@@ -1,0 +1,118 @@
+#include <bits/stdc++.h>
+#include <unordered_set>
+
+using namespace std;
+#define bit(mask, i) ((mask >> i) & 1)
+#define ll long long
+#define nl '\n'
+#define all(x) x.begin(), x.end()
+#define FOR(i, a, n) for (int i = a; i < n; i++)
+#define FORd(i, a, n) for (int i = n - 1; i >= a; i--)
+#define minhtuan0312 ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
+#define sz(x) ((int)(x).size())
+#define pb push_back
+#define eb emplace_back
+#define fi first
+#define se second
+
+const ll mod = 1e9 + 7;
+
+template<class T>
+void maximize(T &x, const T &y) {
+    if (x < y) x = y;
+}
+
+template<class T>
+void minimize(T &x, const T &y) {
+    if (x > y) x = y;
+}
+
+template<typename T1, typename T2>
+void __print(const pair<T1, T2> &p);
+
+template<typename T, typename... V>
+void __print(const vector<T, V...> &v);
+
+template<typename T1, typename T2, typename... V>
+void __print(const map<T1, T2, V...> &m);
+
+template<typename T>
+void __print(const T &x) {cerr << x;}
+
+template<typename T1, typename T2>
+void __print(const pair<T1, T2> &p) {
+    cerr << '(';
+    __print(p.fi);
+    cerr << ", ";
+    __print(p.se);
+    cerr << ')';
+}
+
+template<typename T, typename... V>
+void __print(const vector<T, V...> &v) {
+    cerr << '[';
+    FOR(i, 0, sz(v)) {
+        if(i) cerr << ", ";
+        __print(v[i]);
+    }
+    cerr << ']';
+}
+
+template<typename T1, typename T2, typename... V>
+void __print(const map<T1, T2, V...> &m) {
+    cerr << '{';
+    bool first = 1;
+    for(const auto &x: m) {
+        if(!first) cerr << ", ";
+        first = 0;
+        __print(x);
+    }
+    cerr << '}';
+}
+
+template<typename T>
+void _print(T t) { __print(t);}
+void _print() {}
+template<typename T, typename... V>
+void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...); }
+
+#ifdef LOCAL
+#define deb(...) do {\
+    cerr << "[In " <<  __func__ << "(): line " << __LINE__ << "] [" << #__VA_ARGS__ << "] = [";\
+    _print(__VA_ARGS__);\
+    cerr << ']' << nl;\
+} while(0);
+#else
+#define deb(...)
+#endif
+
+int main(void) {
+    minhtuan0312;
+
+    #define TASK "bcount"
+    if (fopen(TASK ".in", "r")) {
+        freopen(TASK ".in", "r", stdin);
+        freopen(TASK ".out", "w", stdout);
+    }
+
+    int n, q; cin >> n >> q;
+    int pre[n + 1][3];
+    pre[0][0] = pre[0][1] = pre[0][2] = 0;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        pre[i][0] = pre[i - 1][0] + (A[i] - 1 == 0);
+        pre[i][1] = pre[i - 1][1] + (A[i] - 1 == 1);
+        pre[i][2] = pre[i - 1][2] + (A[i] - 1 == 2);
+    }
+    while(q--) {
+        int l, r; cin >> l >> r;
+        cout << pre[r][0] - pre[l - 1][0] << ' ' << pre[r][1] - pre[l - 1][1] << ' ' << pre[r][2] - pre[l - 1][2] << nl;
+    }
+
+
+    return (0 ^ 0);
+
+}
+
+// thou art fair
