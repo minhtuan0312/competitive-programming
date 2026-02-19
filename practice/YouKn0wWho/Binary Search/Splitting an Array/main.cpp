@@ -96,14 +96,41 @@ int main(void) {
     }
 
     int n, k; cin >> n >> k;
-    int A[n + 1];
+    ll A[n + 1];
+    ll maxi = LLONG_MIN, s = 0;
     FOR(i, 1, n + 1) {
         cin >> A[i];
+        maximize(maxi, A[i]);
+        s += A[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    auto check = [&](ll target) -> bool {
+        ll ck = 1;
+        ll cs = 0;
+        FOR(i, 1, n + 1) {
+            if(cs + A[i] <= target) {
+                cs += A[i];
+            } else {
+                ck++;
+                cs = A[i];
+            }
+            if(ck > k) return 0;
+        }
+        return ck <= k;
+    };
+
+    ll l = maxi, r = s, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else {
+            l = m + 1;
+        }
     }
+    cout << res;
+
 
     return (0 ^ 0);
 

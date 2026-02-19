@@ -86,6 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct sct{
+    ll t, z, y;
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,14 +99,44 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
+    int m, n; cin >> m >> n;
+    sct A[n + 1];
     FOR(i, 1, n + 1) {
-        cin >> A[i];
+        cin >> A[i].t >> A[i].z >> A[i].y;
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    auto check = [&] (ll T) {
+        ll cnt = 0;
+        FOR(i, 1, n + 1) {
+            ll tmp = A[i].t * A[i].z + A[i].y;
+            ll cycle = T / tmp;
+            ll rem = T % tmp;
+            ll extra = min(A[i].z, rem / A[i].t);
+            cnt += cycle * A[i].z + extra;
+        }
+        return cnt >= m;
+    };
+
+    ll l = 0, r = 1e9, res;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else {
+            l = m + 1;
+        }
+    }
+    cout << res << nl;
+    FOR(i, 1, n + 1) {
+        ll tmp = A[i].t * A[i].z + A[i].y;
+        ll cycle = res / tmp;
+        ll rem = res % tmp;
+        ll extra = min(A[i].z, rem / A[i].t);
+
+        ll give = min(1ll*m, cycle * A[i].z + extra);
+        cout << give << ' ';
+        m -= give;
     }
 
     return (0 ^ 0);

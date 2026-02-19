@@ -86,6 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+ll floor_div(ll a, ll b) {
+    return a / b - ((a % b != 0) & ((a ^ b) < 0));
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,15 +99,33 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
+    int k, n; cin >> k >> n;
+    ll A[n + 1];
+    ll s = 0;
     FOR(i, 1, n + 1) {
         cin >> A[i];
+        s += A[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    auto check = [&](ll x) {
+        ll cs = 0;
+        FOR(i, 1, n + 1) {
+            cs += min(x, A[i]);
+        }
+        return floor_div(cs, x) >= k;
+    };
+
+    ll l = 1, r = s / k, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
+    cout << res;
 
     return (0 ^ 0);
 

@@ -97,12 +97,15 @@ int main(void) {
 
     int n, k; cin >> n >> k;
     int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
+    FOR(i, 1, n + 1) cin >> A[i];
     FOR(i, 1, k + 1) {
         int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+        auto it = upper_bound(A + 1, A + 1 + n, x);
+        if(it == A + 1) {
+            cout << 0 << nl;
+        } else {
+            cout << prev(it) - A << nl;
+        }
     }
 
     return (0 ^ 0);

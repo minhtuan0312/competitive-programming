@@ -95,14 +95,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
+    int n; cin >> n;
     int A[n + 1];
     FOR(i, 1, n + 1) {
         cin >> A[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+    sort(A + 1, A + 1 + n);
+    int q; cin >> q;
+    while(q--) {
+        int l, r; cin >> l >> r;
+        cout << upper_bound(A + 1, A + 1 + n, r) - lower_bound(A + 1, A + 1 + n, l) << ' ';
     }
 
     return (0 ^ 0);

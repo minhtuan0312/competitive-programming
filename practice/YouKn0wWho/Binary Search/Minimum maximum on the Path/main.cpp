@@ -86,6 +86,31 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<int, int> ii;
+int n, m, d;
+const int limN = 1e5 + 5;
+vector<ii> adj[limN];
+int dist[limN], visited[limN];
+inline bool check(ll mx) {
+    memset(dist, 0, sizeof dist);
+    memset(visited, 0, sizeof visited);
+    queue<int> qu;
+    qu.push(1);
+    visited[1] = 1;
+    while(!qu.empty()) {
+        int u = qu.front(); qu.pop();
+        if(u == n) return 1;
+        for(const auto &[v, w]: adj[u]) {
+            if(!visited[v] && w <= mx && dist[u] + 1 <= d) {
+                visited[v] = 1;
+                dist[v] = dist[u] + 1;
+                qu.push(v);
+            }
+        }
+    }
+    return 0;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,15 +120,56 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+    cin >> n >> m >> d;
+    int maxi = INT_MIN;
+    FOR(i, 1, m + 1) {
+        int u, v, w; cin >> u >> v >> w;
+        adj[u].eb(v, w);
+        maximize(maxi, w);
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    int l = 0, r = maxi, res = -1;
+    while(l <= r) {
+        int mid = (l + r) >> 1;
+        if(check(mid)) {
+            res = mid;
+            r = mid - 1;
+        } else {
+            l = mid + 1;
+        }
     }
+    if(res == -1) return cout << -1, 0;
+
+    int trace[limN];
+    memset(trace, -1, sizeof trace);
+    memset(dist, 0, sizeof dist);
+    memset(visited, 0, sizeof visited);
+    queue<int> qu;
+    qu.push(1);
+    visited[1] = 1;
+
+    while(!qu.empty()) {
+        int u = qu.front(); qu.pop();
+        if(u == n) break;
+        for(const auto &[v, w]: adj[u]) {
+            if(!visited[v] && w <= res && dist[u] + 1 <= d) {
+                visited[v] = 1;
+                dist[v] = dist[u] + 1;
+                qu.push(v);
+                trace[v] = u;
+            }
+        }
+    }
+
+    int last = n;
+    vector<int> ans;
+    while(last != -1){
+        ans.eb(last);
+        last = trace[last];
+    }
+    reverse(all(ans));
+    cout << sz(ans) - 1 << nl;
+    for(const auto &x: ans) cout << x << ' ';
 
     return (0 ^ 0);
 

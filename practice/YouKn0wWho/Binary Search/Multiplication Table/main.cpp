@@ -86,6 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+ll ceil_div(ll a, ll b) {
+    return a / b + ((a % b != 0) & ((a ^ b) >= 0));
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,15 +99,28 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+    ll n; cin >> n;
+    ll k = (n * n + 1) / 2;
+    auto check = [&](ll x) -> bool {
+        ll cnt = 0;
+        FOR(i, 1, n + 1) {
+            cnt += min(n, x / i);
+            if(cnt >= k) return 1;
+        }
+        return cnt >= k;
+    };
+
+    ll l = 1, r = n * n, res = -1;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else {
+            l = m + 1;
+        }
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
-    }
+    cout << res;
 
     return (0 ^ 0);
 

@@ -96,14 +96,38 @@ int main(void) {
     }
 
     int n, k; cin >> n >> k;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
+    ll A[n + 1];
+    FOR(i, 1, n + 1){
         cin >> A[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    sort(A + 1, A + 1 + n);
+
+    auto check = [&](ll d) -> bool {
+        ll ck = k;
+        ck--;
+        ll last_cow_distance = A[1];
+        FOR(i, 2, n + 1) {
+            if(A[i] >= last_cow_distance + d) {
+                ck--;
+                last_cow_distance = A[i];
+            }
+            if(ck <= 0) return 1;
+        }
+        return ck <= 0;
+    };
+
+    ll l = 0, r = A[n] - A[1], res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
+    cout << res;
 
     return (0 ^ 0);
 

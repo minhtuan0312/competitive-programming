@@ -95,15 +95,32 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
+    int n; cin >> n;
+    double x[n + 1], v[n + 1];
     FOR(i, 1, n + 1) {
-        cin >> A[i];
+        cin >> x[i] >> v[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    auto check = [&](double t) {
+        double mini = 1e18, maxi = -1e18;
+        FOR(i, 1, n + 1) {
+            maximize(maxi, x[i] - t * v[i]);
+            minimize(mini, x[i] + t * v[i]);
+        }
+        return maxi <= mini;
+    };
+
+    double l = 0.0, r = 1e9, res = 0.0;
+    FOR(i, 1, 100) {
+        double m = (l + r) / 2.0;
+        if(check(m)) {
+            res = m;
+            r = m;
+        } else {
+            l = m;
+        }
     }
+    cout << fixed << setprecision(6) << res;
 
     return (0 ^ 0);
 

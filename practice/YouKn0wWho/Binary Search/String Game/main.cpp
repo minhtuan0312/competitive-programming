@@ -95,15 +95,41 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
+    string t, p; cin >> t >> p;
+    int n = sz(t), m = sz(p);
+    t = ' ' + t;
+    p = ' ' + p;
     int A[n + 1];
     FOR(i, 1, n + 1) {
         cin >> A[i];
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    auto check = [&](int k) -> bool {
+        vector<bool> removed(n + 1);
+        FOR(i, 1, k + 1) {
+            removed[A[i]] = 1;
+        }
+        int j = 1;
+        FOR(i, 1, n + 1) {
+            if(removed[i]) continue;
+            if(j <= m && t[i] == p[j]) {
+                j++;
+            }
+        }
+        return j == m + 1;
+    };
+
+    int l = 0, r = n, res = 0;
+    while(l <= r) {
+        int m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
+    cout << res;
 
     return (0 ^ 0);
 

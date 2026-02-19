@@ -95,15 +95,39 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, k; cin >> n >> k;
-    int A[n + 1];
+    string s; cin >> s;
+    int n = sz(s);
+    s = ' ' + s;
+    ll needed_b = 0, needed_s = 0, needed_c = 0;
     FOR(i, 1, n + 1) {
-        cin >> A[i];
+        if(s[i] == 'B') needed_b++;
+        if(s[i] == 'S') needed_s++;
+        if(s[i] == 'C') needed_c++;
     }
-    FOR(i, 1, k + 1) {
-        int x; cin >> x;
-        cout << (binary_search(A + 1, A + 1 + n, x)? "YES": "NO") << nl;
+
+    ll nb, ns, nc; cin >> nb >> ns >> nc;
+    ll pb, ps, pc; cin >> pb >> ps >> pc;
+    ll money; cin >> money;
+
+    auto check = [&] (ll burgers) {
+        ll needed_ing_b = burgers * needed_b;
+        ll needed_ing_s = burgers * needed_s;
+        ll needed_ing_c = burgers * needed_c;
+        ll cost = pb * max(0ll, needed_ing_b - nb) + ps * max(0ll, needed_ing_s - ns) + pc * max(0ll, needed_ing_c - nc);
+        return cost <= money;
+    };
+
+    ll l = 0, r = 1e13, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
+    cout << res;
 
     return (0 ^ 0);
 
