@@ -86,83 +86,16 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
+struct Event{
+    int x;
+    int type; // 1: open, -1: close
+    bool operator<(const Event &other) {
+        if(x == other.x) return type > other.type;
+        return x < other.x;
+    }
+};
 
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
-    }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
-    }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
-}
+typedef pair<int, int> ii;
 
 int main(void) {
     minhtuan0312;
@@ -173,9 +106,21 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int n; cin >> n;
+    ii A[n + 1];
+    vector<Event> events;
+    FOR(i, 1, n + 1) {
+        cin >> A[i].fi >> A[i].se;
+        events.pb({A[i].fi, 1});
+        events.pb({A[i].se, -1});
+    }
+    sort(all(events));
+    int cur = 0, best = 0;
+    for(const auto &[x, t]: events) {
+        cur += t;
+        maximize(best, cur);
+    }
+    cout << best;
 
     return (0 ^ 0);
 

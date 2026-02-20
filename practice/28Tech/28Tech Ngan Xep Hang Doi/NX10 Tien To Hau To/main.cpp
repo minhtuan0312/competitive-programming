@@ -89,15 +89,19 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 void solve(string s) {
     int n = sz(s);
     s = ' ' + s;
-    stack<string> st;
+    stack<int> st;
     for(int i = n; i >= 1; i--) {
-        if(isalpha(s[i])) {
-            st.push(string(1, s[i]));
+        if(isdigit(s[i])) {
+            st.push(s[i] - '0');
         } else {
-            string x = st.top(); st.pop();
-            string y = st.top(); st.pop();
-            string xy = x + y + s[i];
-            st.push(xy);
+            int a = st.top(); st.pop();
+            int b = st.top(); st.pop();
+            int ab;
+            if(s[i] == '+') ab = a + b;
+            if(s[i] == '-') ab = a - b;
+            if(s[i] == '*') ab = a * b;
+            if(s[i] == '/') ab = a / b;
+            st.push(ab);
         }
     }
     cout << st.top();

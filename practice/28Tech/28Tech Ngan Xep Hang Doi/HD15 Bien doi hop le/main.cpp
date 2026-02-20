@@ -86,82 +86,48 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
+const int limN = 1e5 + 5;
+bitset<limN> isPrime;
+void init() {
+    isPrime.set();
+    isPrime[0] = isPrime[1] = 0;
+    for(ll i = 2; i * i < limN; i++) {
+        if(isPrime[i]) {
+            for(int j = i * i; j < limN; j += i) {
+                isPrime[j] = 0;
             }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
         }
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
-    }
-    return res;
 }
 
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
+typedef pair<int, int> ii;
+int solve() {
+    ll s, t; cin >> s >> t;
+    if(s == t) return 0;
+    int visited[limN] = {0};
+    queue<ii> qu;
+    qu.push({s, 0});
+    visited[s] = 1;
+    while(!qu.empty()) {
+        auto [u, d] = qu.front(); qu.pop();
+        if(u == t) return d;
+        string tmp = to_string(u);
+        FOR(i, 0, sz(tmp)) {
+            char org = tmp[i];
+            int st = i == 0? 1: 0;
+            FOR(j, st, 10) {
+                if(j == org) continue;
+                tmp[i] = j + '0';
+                int n = stoi(tmp);
+                if(isPrime[n] && !visited[n]) {
+                    visited[n] = 1;
+                    qu.push({n, d + 1});
+                }
+            }
+            tmp[i] = org;
+        }
     }
     return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
 }
 
 int main(void) {
@@ -173,9 +139,11 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    init();
+
+    int t; cin >> t;
+    while(t--) cout << solve() << nl;
+
 
     return (0 ^ 0);
 

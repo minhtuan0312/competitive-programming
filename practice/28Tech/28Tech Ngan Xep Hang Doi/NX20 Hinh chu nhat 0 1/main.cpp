@@ -86,84 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
-    }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
-    }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
-}
-
 int main(void) {
     minhtuan0312;
 
@@ -173,10 +95,51 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int n, m; cin >> n >> m;
+    bool A[n + 1][m + 1];
+    int dp[n + 1][m + 1];
+    memset(dp, 0, sizeof dp);
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, m + 1) {
+            cin >> A[i][j];
+            dp[i][j] = (A[i][j] == 1? dp[i - 1][j] + 1: 0);
+        }
+    }
 
+    stack<int> st;
+    int min_left[m + 1], min_right[m + 1];
+    ll res = LLONG_MIN;
+    for(int bottom = n; bottom >= 1; bottom--) {
+        auto heights = dp[bottom];
+        FOR(i, 1, m + 1) {
+            while(!st.empty() && heights[st.top()] > heights[i]) {
+                min_right[st.top()] = i;
+                st.pop();
+            }
+            st.push(i);
+        }
+        while(!st.empty()) {
+            min_right[st.top()] = m + 1;
+            st.pop();
+        }
+        for(int i = m; i >= 1; i--) {
+            while(!st.empty() && heights[st.top()] > heights[i]) {
+                min_left[st.top()] = i;
+                st.pop();
+            }
+            st.push(i);
+        }
+        while(!st.empty()) {
+            min_left[st.top()] = 0;
+            st.pop();
+        }
+        ll cur = LLONG_MIN;
+        FOR(i, 1, m + 1) {
+            maximize(cur, 1ll * (min_right[i] - min_left[i] - 1) * heights[i]);
+        }
+        maximize(res, cur);
+    }
+    cout << res;
     return (0 ^ 0);
 
 }

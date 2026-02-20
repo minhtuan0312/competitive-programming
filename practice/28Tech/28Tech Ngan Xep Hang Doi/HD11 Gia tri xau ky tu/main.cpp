@@ -86,82 +86,32 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
+void solve() {
+    int k; cin >> k;
+    string s; cin >> s;
     int n = sz(s);
     s = ' ' + s;
+    int freq[26] = {};
+    priority_queue<int> pq;
     FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
+        freq[s[i] - '0']++;
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
+    FOR(i, 0, 26) {
+        if(freq[i])
+            pq.push(freq[i]);
     }
-    return res;
-}
+    while(k-- && !pq.empty()) {
+        int u = pq.top(); pq.pop();
+        u--;
+        if(u > 0) pq.push(u);
+    }
+    ll res = 0;
+    while(!pq.empty()) {
+        int u = pq.top(); pq.pop();
+        res += 1ll * u * u;
+    }
+    cout << res << nl;
 
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
 }
 
 int main(void) {
@@ -173,9 +123,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int t; cin >> t;
+    while(t--) solve();
 
     return (0 ^ 0);
 

@@ -86,83 +86,46 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
+struct Event{
+    ll x;
+    int type; // 1: open (cạnh trái), -1: close (cạnh phải)
+    ll y1, y2;
+    bool operator <(const Event &other) const {
+        if(x == other.x) return type > other.type;
+        return x < other.x;
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
+};
+
+vector<ll> compress;
+struct Node{
+    int cnt; // số lần bị phủ (counter)
+    int len; // độ dài thực tế bị phủ
+};
+struct segment_tree{
+    int n;
+    vector<Node> st;
+    segment_tree() {}
+    segment_tree(int n): n(n), st(n << 2) {}
+    void upd(int v, int l, int r, int ql, int qr, int val) {
+        if(ql > qr) return;
+        if(l == ql && r == qr) {
+            st[v].cnt += val;
         } else {
-            st.pop();
+            int m = (r + l) >> 1;
+            upd(v << 1, l, m, ql, min(qr, m), val);
+            upd(v << 1 | 1, m + 1, r, max(ql, m + 1), qr, val);
         }
-    }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
+        if(st[v].cnt > 0) {
+            // bị phủ hoàn toàn, độ dài = khoảng cách giữa 2 đầu tọa độ
+            // Y[r + 1] - Y[l] -> compress[r] - compress[l - 1]
+            st[v].len = compress[r] - compress[l - 1];
         } else {
-            st.push(stod(tmp));
+            // không bị phủ hoàn toàn, lấy tổng từ 2 con
+            if (l == r) st[v].len = 0;
+            else st[v].len = st[v << 1].len + st[v << 1 | 1].len;
         }
     }
-    return st.top();
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -173,12 +136,37 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int n; cin >> n;
+    vector<Event> events;
+    FOR(i, 1, n + 1) {
+        ll x1, y1, x2, y2;
+        cin >> x1 >> y1 >> x2 >> y2;
+        events.pb({x1, 1, y1, y2});
+        events.pb({x2, -1, y1, y2});
+        compress.eb(y1);
+        compress.eb(y2);
+    }
+    sort(all(compress));
+    compress.erase(unique(all(compress)), compress.end());
+    sort(all(events));
+
+    ll res = 0;
+    ll m = size(compress);
+    segment_tree seg(m - 1); // quản lý đoạn nên kích thước phải là m - 1
+    ll last_x = events[0].x;
+    for(const auto &e: events) {
+        // cộng dồn diện tích: độ dài x * độ dài y đang bao phủ
+        res += (e.x - last_x) * seg.st[1].len;
+        int l = lower_bound(all(compress), e.y1) - compress.begin() + 1;
+        int r = lower_bound(all(compress), e.y2) - compress.begin() + 1;
+        if(l < r) {
+            seg.upd(1, 1, m - 1, l, r - 1, e.type);
+        }
+        last_x = e.x;
+    }
+    cout << res;
 
     return (0 ^ 0);
-
 }
 
 // thou art fair

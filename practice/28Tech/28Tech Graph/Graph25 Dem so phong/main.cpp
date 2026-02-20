@@ -86,82 +86,21 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
+int n, m;
+const int limN = 1005;
+char A[limN][limN];
+bool visited[limN][limN];
+int dx[4] = {0, 0, 1, -1};
+int dy[4] = {1, -1, 0, 0};
+void dfs(int x, int y) {
+    visited[x][y] = 1;
+    FOR(k, 0, 4) {
+        int nx = x + dx[k];
+        int ny = y + dy[k];
+        if(nx >= 1 && ny >= 1 && nx <= n && ny <= m && A[nx][ny] == '.' && !visited[nx][ny]) {
+            dfs(nx, ny);
         }
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
-    }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
 }
 
 int main(void) {
@@ -173,9 +112,20 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    cin >> n >> m;
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, m + 1) cin >> A[i][j];
+    }
+    int cc = 0;
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, m + 1) {
+            if(!visited[i][j] && A[i][j] == '.') {
+                cc++;
+                dfs(i, j);
+            }
+        }
+    }
+    cout << cc;
 
     return (0 ^ 0);
 

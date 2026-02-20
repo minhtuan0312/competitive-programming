@@ -23,8 +23,9 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,83 +87,27 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
+struct Point{
+    double x, y;
+    int id; //nếu đề bài yêu cầu in ra vị trí điểm
+    bool operator<(const Point &other) const {
+        if(x == other.x) return y < other.y;
+        return x < other.x;
+    }
+};
+
+typedef pair<int, int> ii;
+
+double dist(Point a, Point b) {
+    return sqrt((a.x - b.x) * (a.x - b.x) + (a.y - b.y) * (a.y - b.y));
 }
 
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
-        }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
+struct cmp{
+    bool operator()(const Point &a, const Point &b) const {
+        if(a.y == b.y) return a.x < b.x;
+        return a.y < b.y;
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
-    }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
-    }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -173,9 +118,40 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int n; cin >> n;
+    Point A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].x >> A[i].y;
+        A[i].id = i;
+    }
+    sort(A + 1, A + 1 + n); // sort theo hoành độ
+    set<Point, cmp> se;
+
+    double min_d = 1e18;
+    int best_i = -1, best_j = -1;
+    int j = 1;
+    FOR(i, 1, n + 1) {
+        while(j < i && A[i].x - A[j].x >= min_d) {
+            se.erase(A[j]);
+            j++;
+        }
+        // lấy y đầu tiên thõa mãn [y[i] - d, y[i] + d]
+        // x = -1e18 để đảm bảo nếu nhiều điểm cùng y thì lấy điểm đầu tiên
+        Point lower_bound_pt = {-1e18, A[i].y - min_d, - 1};
+        auto it = se.lower_bound(lower_bound_pt);
+        while(it != se.end() && it->y <= A[i].y + min_d) {
+            if(minimize(min_d, dist(A[i], *it))) {
+                best_i = A[i].id;
+                best_j = it->id;
+            }
+            it++;
+        }
+        se.insert(A[i]);
+    }
+    if(best_i > best_j) swap(best_i, best_j);
+    best_i--, best_j--;
+    cout << best_i << ' ' << best_j << ' ';
+    cout << fixed << setprecision(6) << min_d;
 
     return (0 ^ 0);
 

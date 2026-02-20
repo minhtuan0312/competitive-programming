@@ -86,64 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const ll NO_LAZY = 0;
-struct segment_tree {
-    int n;
-    vector<ll> st, lazy_A, lazy_B;
-    segment_tree() {}
-    segment_tree(int n): n(n), st(n << 2), lazy_A(n << 2, NO_LAZY), lazy_B(n << 2, NO_LAZY) {}
-    ll sum_index(ll l, ll r) {
-        return (r + l) * (r - l + 1) / 2;
-    }
-    void build(int v, int l, int r, int A[]) {
-        if(l == r) {
-            return st[v] = A[l], void();
-        }
-        int m = (l + r) >> 1;
-        build(v << 1, l, m, A);
-        build(v << 1 | 1, m + 1, r, A);
-        st[v] = st[v << 1] + st[v << 1 | 1];
-    }
-    void push(int v, int l, int r) {
-        if(lazy_A[v] == NO_LAZY && lazy_B[v] == NO_LAZY) return;
-        int m = (l + r) >> 1;
-        ll A = lazy_A[v], B = lazy_B[v];
-        st[v << 1] += A * sum_index(l, m) + B * (m - l + 1); // l -> m
-        st[v << 1 | 1] += A * sum_index(m + 1, r) + B * (r - m); // m + 1 -> r
-        lazy_A[v << 1] += A;
-        lazy_A[v << 1 | 1] += A;
-        lazy_A[v] = NO_LAZY;
-        lazy_B[v << 1] += B;
-        lazy_B[v << 1 | 1] += B;
-        lazy_B[v] = NO_LAZY;
-    }
-    void upd(int v, int l, int r, int ql, int qr, ll A, ll B) {
-        if(ql > qr) return;
-        if(ql == l && qr == r) {
-            st[v] += A * sum_index(l, r) + B * (r - l + 1);
-            lazy_A[v] += A;
-            lazy_B[v] += B;
-            return;
-        }
-        push(v, l, r);
-        int m = (l + r) >> 1;
-        upd(v << 1, l, m, ql, min(m, qr), A, B);
-        upd(v << 1 | 1, m + 1, r, max(m + 1, ql), qr, A, B);
-        st[v] = st[v << 1] + st[v << 1 | 1];
-    }
-    ll query(int v, int l, int r, int ql, int qr) {
-        if(ql > qr) return 0;
-        if(ql == l && qr == r) {
-            return st[v];
-        }
-        push(v, l, r);
-        int m = (l + r) >> 1;
-        ll q1 = query(v << 1, l, m, ql, min(m, qr));
-        ll q2 = query(v << 1 | 1, m + 1, r, max(m + 1, ql), qr);
-        return q1 + q2;
-    }
-};
-
 int main(void) {
     minhtuan0312;
 
@@ -154,20 +96,35 @@ int main(void) {
     }
 
     int n; cin >> n;
-    int A[n + 1];
+    int A[n + 1], greater_right[n + 1], smaller_right[n + 1];
+    FOR(i, 1, n + 1) cin >> A[i];
+    stack<int> st;
     FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    segment_tree seg(n);
-    seg.build(1, 1, n, A);
-    int q; cin >> q;
-    while(q--) {
-        int op, l, r; cin >> op >> l >> r;
-        if(op == 1) {
-            seg.upd(1, 1, n, l, r, 1, 1 - l);
-        } else {
-            cout << seg.query(1, 1, n, l, r) << nl;
+        while(!st.empty() && A[st.top()] < A[i]) {
+            greater_right[st.top()] = i;
+            st.pop();
         }
+        st.push(i);
+    }
+    while(!st.empty()) {
+        greater_right[st.top()] = -1;
+        st.pop();
+    }
+    FOR(i, 1, n + 1) {
+        while(!st.empty() && A[st.top()] > A[i]) {
+            smaller_right[st.top()] = i;
+            st.pop();
+        }
+        st.push(i);
+    }
+    while(!st.empty()) {
+        smaller_right[st.top()] = -1;
+        st.pop();
+    }
+    FOR(i, 1, n + 1) {
+        if(greater_right[i] != -1 && smaller_right[greater_right[i]] != -1) {
+            cout << A[smaller_right[greater_right[i]]] << ' ';
+        } else cout << -1 << ' ';
     }
 
     return (0 ^ 0);

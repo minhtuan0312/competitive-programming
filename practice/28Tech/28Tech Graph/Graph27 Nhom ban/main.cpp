@@ -86,83 +86,32 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int priority(const char &c) {
-    if(c == '-' || c == '+') return 1;
-    if(c == '*' || c == '/') return 2;
-    if(c == '^') return 3;
-    return 0;
-}
-
-string toPostfix(string s) {
-    string res;
-    stack<char> st;
-    int n = sz(s);
-    s = ' ' + s;
-    FOR(i, 1, n + 1) {
-        if(isspace(s[i])) continue;
-        if(isdigit(s[i])) {
-            while(i <= n && (isdigit(s[i]) || s[i] == '.')) {
-                res += s[i++];
-            }
-            res += " "; // phân cách các số
-            i--;
+struct disjoint_set_union{
+    int n;
+    vector<int> sz_, parent;
+    int comps;
+    disjoint_set_union() {}
+    disjoint_set_union(int n): n(n), parent(n + 1), sz_(n + 1, 1) {
+        FOR(i, 1, n + 1) {
+            parent[i] = i;
         }
-        else if(s[i] == '(') {
-            st.push(s[i]);
-        }
-        else if(s[i] == ')') {
-            while(!st.empty() && st.top() != '(') {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            if(!st.empty()) st.pop(); // đẩy dấu '(' ra
-        }
-        else {
-            while(!st.empty() && st.top() != '(' && (priority(s[i]) < priority(st.top()) || (priority(s[i]) == priority(st.top()) && s[i] != '^'))) {
-                res += st.top(); st.pop();
-                res += " ";
-            }
-            st.push(s[i]);
-        }
+        comps = n;
     }
-    while(!st.empty()) {
-        if(st.top() != '(') {
-            res += st.top(); st.pop();
-            res += " ";
-        } else {
-            st.pop();
-        }
+    int Find(int u) {
+        if(parent[u] == u) return u;
+        return parent[u] = Find(parent[u]);
     }
-    return res;
-}
-
-double applyOp(double a, double b, char op) {
-    switch(op) {
-        case '+': return a + b;
-        case '-': return a - b;
-        case '*': return a * b;
-        case '/': return a / b;
-        case '^': return pow(a, b);
+    bool Unite(int u, int v){
+        u = Find(u);
+        v = Find(v);
+        if(u == v) return 0;
+        if(sz_[u] < sz_[v]) swap(u, v);
+        sz_[u] += sz_[v];
+        parent[v] = u;
+        comps--;
+        return 1;
     }
-    return 0;
-}
-
-double evaluatePostfix(string s) {
-    stringstream ss(s);
-    string tmp;
-    stack<double> st;
-    while(ss >> tmp) {
-        if(sz(tmp) == 1 && !isdigit(tmp[0]) && tmp[0] != '.') {
-            double b = st.top(); st.pop();
-            double a = st.top(); st.pop();
-            double ab = applyOp(a, b, tmp[0]);
-            st.push(ab);
-        } else {
-            st.push(stod(tmp));
-        }
-    }
-    return st.top();
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -173,9 +122,18 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    string s; getline(cin, s);
-    string pf = toPostfix(s);
-    cout << evaluatePostfix(pf);
+    int n, m; cin >> n >> m;
+    disjoint_set_union dsu(n);
+    FOR(i, 1, m + 1) {
+        int u, v; cin >> u >> v;
+        dsu.Unite(u, v);
+    }
+    int res = 0;
+    FOR(i, 1, n + 1) {
+        if(dsu.parent[i] == i) // i có phải là leader không?
+            maximize(res, dsu.sz_[leader]);
+    }
+    cout << res;
 
     return (0 ^ 0);
 
