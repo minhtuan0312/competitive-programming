@@ -86,16 +86,18 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
+int n, m, s;
 const int limN = 1005;
 vector<int> adj[limN];
-int dist[limN];
-
-void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
+int visited[limN];
+vector<pair<int, int>> st;
+void dfs(int u) {
+    visited[u] = 1;
     for(const int &v: adj[u]) {
-        if(v == p) continue;
-        dfs(v, u);
+        if(!visited[v]) {
+            st.eb(u, v);
+            dfs(v);
+        }
     }
 }
 
@@ -108,15 +110,17 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n) {
+    cin >> n >> m >> s;
+    FOR(i, 1, m + 1) {
         int u, v; cin >> u >> v;
         adj[u].eb(v);
         adj[v].eb(u);
     }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    FOR(i, 1, n + 1) {
+        sort(all(adj[i]));
+    }
+    dfs(s);
+    for(const auto &[u, v]: st) cout << u << "->" << v << nl;
 
     return (0 ^ 0);
 

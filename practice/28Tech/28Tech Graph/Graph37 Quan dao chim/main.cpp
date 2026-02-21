@@ -86,17 +86,53 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
+int n, m;
 const int limN = 1005;
 vector<int> adj[limN];
-int dist[limN];
+set<int> ap;
+int timer = 0;
+int disc[limN], low[limN];
 
 void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
+
+    disc[u] = low[u] = ++timer;
+    int child = 0;
+
     for(const int &v: adj[u]) {
         if(v == p) continue;
-        dfs(v, u);
+        if(!disc[v]) {
+            child++;
+            dfs(v, u);
+            minimize(low[u], low[v]);
+            if(p && disc[u] <= low[v]) ap.insert(u);
+        } else {
+            minimize(low[u], disc[v]);
+        }
     }
+    if(p == 0 && child > 1) {
+        ap.insert(u);
+    }
+}
+
+void solve() {
+
+    memset(disc, 0, sizeof disc);
+    memset(low, 0, sizeof low);
+    ap.clear();
+    cin >> n >> m;
+    FOR(i, 1, n + 1) {
+        adj[i].clear();
+    }
+    FOR(i, 1, m + 1) {
+        int u, v; cin >> u >> v;
+        adj[u].eb(v);
+        adj[v].eb(u);
+    }
+    FOR(i, 1, n + 1) {
+        if(!disc[i]) dfs(i, 0);
+    }
+    cout << sz(ap) << nl;
+
 }
 
 int main(void) {
@@ -108,15 +144,8 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
-        adj[v].eb(u);
-    }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    int t = 1;
+    while(t--) solve();
 
     return (0 ^ 0);
 

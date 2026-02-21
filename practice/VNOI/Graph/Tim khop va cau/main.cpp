@@ -86,16 +86,40 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-const int limN = 1005;
-vector<int> adj[limN];
-int dist[limN];
+typedef pair<int, int> ii;
+int n, m;
+const int limN = 10005;
+// đổi mảng kề sang lưu pair: {v, edge_id}
+vector<ii> adj[limN];
+int timer = 0;
+int low[limN], disc[limN];
+set<int> ap;
+vector<ii> bridges;
+void dfs(int u, int pid) { // (đỉnh hiện tại, ID cạnh vừa đi qua)
+    disc[u] = low[u] = ++timer;
+    int child = 0;
 
-void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
-    for(const int &v: adj[u]) {
-        if(v == p) continue;
-        dfs(v, u);
+    for(const auto &[v, id]: adj[u]) {
+        // chỉ bỏ qua đúng cái cạnh vừa đi tới *quan trọng
+        if(id == pid) continue;
+        if(!disc[v]) {
+            child++;
+            dfs(v, id);
+            minimize(low[u], low[v]);
+            if(disc[u] <= low[v] && pid) {
+                ap.insert(u);
+            }
+            if(disc[u] < low[v]) {
+                bridges.eb(u, v);
+                // nếu đề bài yêu cầu in chỉ số cạnh là cầu:
+                // bridges_id.push_back(id);
+            }
+        } else {
+            minimize(low[u], disc[v]);
+        }
+    }
+    if(!pid && child > 1) {
+        ap.insert(u);
     }
 }
 
@@ -108,15 +132,19 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n) {
+    cin >> n >> m;
+    FOR(i, 1, m + 1) {
         int u, v; cin >> u >> v;
-        adj[u].eb(v);
-        adj[v].eb(u);
+        // lưu đỉnh và id cạnh i
+        adj[u].eb(v, i);
+        adj[v].eb(u, i);
     }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    FOR(i, 1, n + 1) {
+        if(!disc[i]) {
+            dfs(i, 0);
+        }
+    }
+    cout << sz(ap) << ' ' << sz(bridges);
 
     return (0 ^ 0);
 

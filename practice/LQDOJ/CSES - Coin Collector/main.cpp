@@ -86,18 +86,42 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-const int limN = 1005;
+int n, m;
+const int limN = 1e5 + 5;
 vector<int> adj[limN];
-int dist[limN];
+int A[limN];
 
-void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
+int timer = 0;
+int disc[limN], low[limN];
+stack<int> st;
+int onStack[limN];
+int scc = 0;
+int scc_id[limN];
+void dfs(int u) {
+    disc[u] = low[u] = ++timer;
+    st.push(u);
+    onStack[u] = 1;
     for(const int &v: adj[u]) {
-        if(v == p) continue;
-        dfs(v, u);
+        if(!disc[v]) {
+            dfs(v);
+            minimize(low[u], low[v]);
+        } else if(onStack[v]){
+            minimize(low[u], disc[v]);
+        }
+    }
+    if(disc[u] == low[u]) {
+        scc++;
+        while(1) {
+            int v = st.top(); st.pop();
+            scc_id[v] = scc;
+            onStack[v] = 0;
+            if(v == u) break;
+        }
     }
 }
+vector<int> dag[limN]; // đồ thị dag sau khi nén
+ll weight_scc[limN]; // trọng số (tổng A[i]) của mỗi siêu đỉnh
+ll dp[limN];
 
 int main(void) {
     minhtuan0312;
@@ -108,15 +132,40 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n) {
+    cin >> n >> m;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, m + 1) {
         int u, v; cin >> u >> v;
         adj[u].eb(v);
-        adj[v].eb(u);
     }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    // bước 1: chạy tarjan tìm scc_id
+    FOR(u, 1, n + 1) {
+        if(!disc[u]) dfs(u);
+    }
+    // bước 2: duyệt qua mọi cạnh (u,v)
+    FOR(u, 1, n + 1) {
+        for(const int &v: adj[u]) {
+            // nếu u và v thuộc 2 scc khác nhau, tạo cạnh nối 2 siêu đỉnh
+            if(scc_id[u] != scc_id[v]) {
+                dag[scc_id[u]].eb(scc_id[v]);
+            }
+        }
+    }
+    // bước 3: giải quyết bài toán
+    FOR(u, 1, n + 1) {
+        weight_scc[scc_id[u]] += A[u]; // tính trọng số cho mỗi siêu đỉnh scc
+    }
+    ll res = 0; // dp[u] = max(dp[v]) + weight
+    FOR(u, 1, scc + 1) {
+        maximize(dp[u], weight_scc[u]); // skip
+        for(const int &v: dag[u]) {
+            maximize(dp[u], dp[v] + weight_scc[u]); // take
+        }
+        maximize(res, dp[u]);
+    }
+    cout << res;
 
     return (0 ^ 0);
 

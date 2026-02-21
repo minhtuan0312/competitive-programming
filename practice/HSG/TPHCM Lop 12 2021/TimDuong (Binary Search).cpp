@@ -86,17 +86,35 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-const int limN = 1005;
-vector<int> adj[limN];
-int dist[limN];
+int dx[4] = {0, 0, 1, -1};
+int dy[4] = {1, -1, 0, 0};
 
-void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
-    for(const int &v: adj[u]) {
-        if(v == p) continue;
-        dfs(v, u);
+typedef pair<int, int> ii;
+
+int n;
+const int limN = 505;
+int A[limN][limN];
+int visited[limN][limN];
+int session = 0;
+
+inline bool check(int M) {
+    session++;
+    queue<ii> qu;
+    qu.push({1, 1});
+    visited[1][1] = session;
+    while(!qu.empty()) {
+        auto [x, y] = qu.front(); qu.pop();
+        if(x == n && y == n) return 1;
+        FOR(k, 0, 4) {
+            int nx = x + dx[k];
+            int ny = y + dy[k];
+            if(nx >= 1 && ny >= 1 && nx <= n && ny <= n && visited[nx][ny] != session && abs(A[nx][ny] - A[x][y]) <= M) {
+                visited[nx][ny] = session;
+                qu.push({nx, ny});
+            }
+        }
     }
+    return 0;
 }
 
 int main(void) {
@@ -109,14 +127,23 @@ int main(void) {
     }
 
     cin >> n;
-    FOR(i, 1, n) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
-        adj[v].eb(u);
+    FOR(i, 1, n + 1) {
+        FOR(j, 1, n + 1) {
+            cin >> A[i][j];
+        }
     }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+
+    int l = 0, r = 1e6, res;
+    while(l <= r) {
+        int m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else {
+            l = m + 1;
+        }
+    }
+    cout << res;
 
     return (0 ^ 0);
 

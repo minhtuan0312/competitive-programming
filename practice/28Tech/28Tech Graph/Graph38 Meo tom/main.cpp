@@ -86,16 +86,27 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-const int limN = 1005;
+int n, k;
+const int limN = 100005;
 vector<int> adj[limN];
-int dist[limN];
-
+bool A[limN];
+int cnt[limN];
+int res = 0;
 void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
+    if(p == 0) {
+        cnt[u] = A[u];
+    } else {
+        cnt[u] = (A[u]? cnt[p] + 1: 0);
+    }
+    if(cnt[u] > k) return;
+    bool leaf = 1;
     for(const int &v: adj[u]) {
         if(v == p) continue;
+        leaf = 0;
         dfs(v, u);
+    }
+    if(leaf) {
+        res++;
     }
 }
 
@@ -108,15 +119,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
+    cin >> n >> k;
+    FOR(i, 1, n + 1) cin >> A[i];
     FOR(i, 1, n) {
         int u, v; cin >> u >> v;
         adj[u].eb(v);
         adj[v].eb(u);
     }
-    memset(dist, -1, sizeof dist);
+    memset(cnt, -1, sizeof cnt);
     dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    cout << res;
 
     return (0 ^ 0);
 

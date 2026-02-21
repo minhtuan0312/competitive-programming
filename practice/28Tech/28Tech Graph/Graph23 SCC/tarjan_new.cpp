@@ -86,16 +86,35 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n;
-const int limN = 1005;
+int n, m;
+const int limN = 1e4 + 5;
 vector<int> adj[limN];
-int dist[limN];
 
-void dfs(int u, int p) {
-    dist[u] = (p == 0? 0: dist[p] + 1);
+int timer = 0;
+int disc[limN], low[limN];
+bool onStack[limN];
+stack<int> st;
+int scc = 0;
+
+void dfs(int u) {
+    disc[u] = low[u] = ++timer;
+    st.push(u);
+    onStack[u] = 1;
     for(const int &v: adj[u]) {
-        if(v == p) continue;
-        dfs(v, u);
+        if(!disc[v]) {
+            dfs(v);
+            minimize(low[u], low[v]);
+        } else if(onStack[v]){
+            minimize(low[u], disc[v]);
+        }
+    }
+    if(low[u] == disc[u]) {
+        scc++;
+        while(1) {
+            int v = st.top(); st.pop();
+            onStack[v] = 0;
+            if(u == v) break;
+        }
     }
 }
 
@@ -108,15 +127,15 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n;
-    FOR(i, 1, n) {
+    cin >> n >> m;
+    FOR(i, 1, m + 1) {
         int u, v; cin >> u >> v;
         adj[u].eb(v);
-        adj[v].eb(u);
     }
-    memset(dist, -1, sizeof dist);
-    dfs(1, 0);
-    FOR(i, 1, n + 1) cout << dist[i] << ' ';
+    FOR(i, 1, n + 1) {
+        if(!disc[i]) dfs(i);
+    }
+    cout << scc;
 
     return (0 ^ 0);
 
