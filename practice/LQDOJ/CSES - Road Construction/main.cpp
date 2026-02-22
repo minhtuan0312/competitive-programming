@@ -86,6 +86,34 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct disjoint_set_union{
+    int n;
+    vector<int> sz, parent;
+    int comp, mx_size;
+    disjoint_set_union() {}
+    disjoint_set_union(int n): n(n), parent(n + 1) {
+        sz.assign(n + 1, 1);
+        FOR(i, 1, n + 1) parent[i] = i;
+        comp = n;
+        mx_size = 0;
+    }
+    int Find(int u) {
+        if(u == parent[u]) return u;
+        return parent[u] = Find(parent[u]);
+    }
+    bool Unite(int u, int v) {
+        u = Find(u);
+        v = Find(v);
+        if(u == v) return 0;
+        if(sz[u] < sz[v]) swap(u, v);
+        sz[u] += sz[v];
+        parent[v] = u;
+        comp--;
+        maximize(mx_size, sz[u]);
+        return 1;
+    }
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,28 +123,14 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
-
-    auto check = [&](ll x) {
-        ll res = 0;
-        FOR(i, 1, n + 1) {
-            res += min(n, x / i);
-        }
-        return res;
-    };
-
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
-        ll m = (l + r) >> 1;
-        if(check(m) >= k) {
-            res = m;
-            r = m - 1;
-        } else {
-            l = m + 1;
-        }
+    int n, m;
+    cin >> n >> m;
+    disjoint_set_union dsu(n);
+    FOR(i, 1, m + 1) {
+        int u, v; cin >> u >> v;
+        dsu.Unite(u, v);
+        cout << dsu.comp << ' ' << dsu.mx_size << nl;
     }
-
-    cout << res;
 
     return (0 ^ 0);
 

@@ -18,8 +18,9 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) return x = y, 1;
+    return 0;
 }
 
 template<class T>
@@ -86,6 +87,49 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 2e6 + 5;
+const int base = 911;
+const int mod1 = 1e9 + 7;
+const int mod2 = 1e9 + 9;
+
+ll pow1[limN], pow2[limN];
+void init() {
+    pow1[0] = pow2[0] = 1;
+    FOR(i, 1, limN) {
+        pow1[i] = pow1[i - 1] * base % mod1;
+        pow2[i] = pow2[i - 1] * base % mod2;
+    }
+}
+
+typedef pair<ll, ll> ii;
+struct string_hashing{
+    int n;
+    string s;
+    vector<ll> dp1, dp2;
+    string_hashing() {}
+    string_hashing(string s, int n): s(s), n(n), dp1(n + 1), dp2(n + 1) {
+        FOR(i, 1, n + 1) {
+            dp1[i] = dp1[i - 1] * base % mod1 + s[i];
+            dp1[i] %= mod1;
+            dp2[i] = dp2[i - 1] * base % mod2 + s[i];
+            dp2[i] %= mod2;
+        }
+    }
+    ii query(int l, int r) {
+        if(l > r) return {0, 0};
+        ll v1 = dp1[r] - dp1[l - 1] * pow1[r - l + 1] % mod1;
+        v1 += mod1;
+        v1 %= mod1;
+        ll v2 = dp2[r] - dp2[l - 1] * pow2[r - l + 1] % mod2;
+        v2 += mod2;
+        v2 %= mod2;
+        return {v1, v2};
+    }
+    ii operator()(int l, int r) {
+        return query(l, r);
+    }
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,28 +139,45 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
+    init();
 
-    auto check = [&](ll x) {
-        ll res = 0;
-        FOR(i, 1, n + 1) {
-            res += min(n, x / i);
+    string s; cin >> s;
+    string tmp = "#";
+    for(const char &c: s) {
+        tmp.pb(c);
+        tmp.pb('#');
+    }
+    s = tmp;
+    int n = sz(s);
+    string rev_s = s;
+    reverse(all(rev_s));
+    s = ' ' + s;
+    rev_s = ' ' + rev_s;
+    string_hashing hash_forward(s, n), hash_reverse(rev_s, n);
+    int res = -1;
+    int best_center = -1;
+    FOR(i, 1, n + 1) {
+        int l = 0, r = min(i - 1, n - i), best = 0;
+        while(l <= r) {
+            int m = (l + r) >> 1;
+            int rev_l = n - (i + m) + 1;
+            int rev_r = n - (i - m) + 1;
+            if(hash_forward(i - m, i + m) == hash_reverse(rev_l, rev_r)) {
+                best = m;
+                l = m + 1;
+            } else r = m - 1;
         }
-        return res;
-    };
-
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
-        ll m = (l + r) >> 1;
-        if(check(m) >= k) {
-            res = m;
-            r = m - 1;
-        } else {
-            l = m + 1;
+        if(maximize(res, best)) {
+            res = best;
+            best_center = i;
+        };
+    }
+    if(res != -1) {
+        cout << res << nl;
+        for(const char &c: s.substr(best_center - res, (res << 1 | 1))) {
+            if(c != '#') cout << c;
         }
     }
-
-    cout << res;
 
     return (0 ^ 0);
 

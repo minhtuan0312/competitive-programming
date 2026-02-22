@@ -86,6 +86,68 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+const int limN = 1e5 + 5;
+const int base = 911;
+const int mod1 = 1e9 + 7;
+const int mod2 = 1e9 + 9;
+
+ll pow1[limN], pow2[limN];
+void init() {
+    pow1[0] = pow2[0] = 1;
+    FOR(i, 1, limN) {
+        pow1[i] = pow1[i - 1] * base % mod1;
+        pow2[i] = pow2[i - 1] * base % mod2;
+    }
+}
+
+typedef pair<ll, ll> ii;
+struct string_hashing{
+    int n;
+    string s;
+    vector<ll> dp1, dp2;
+    string_hashing() {}
+    string_hashing(string s, int n): s(s), n(n), dp1(n + 1), dp2(n + 1) {
+        FOR(i, 1, n + 1) {
+            dp1[i] = dp1[i - 1] * base % mod1 + s[i];
+            dp1[i] %= mod1;
+            dp2[i] = dp2[i - 1] * base % mod2 + s[i];
+            dp2[i] %= mod2;
+        }
+    }
+    ii query(int l, int r) {
+        if(l > r) return {0, 0};
+        ll v1 = dp1[r] - dp1[l - 1] * pow1[r - l + 1] % mod1;
+        v1 += mod1;
+        v1 %= mod1;
+        ll v2 = dp2[r] - dp2[l - 1] * pow2[r - l + 1] % mod2;
+        v2 += mod2;
+        v2 %= mod2;
+        return {v1, v2};
+    }
+    ii operator()(int l, int r) {
+        return query(l, r);
+    }
+    int lcp(int a, int b, int c, int d) {
+        int l = 1, r = min(b - a + 1, d - c + 1), res = 0;
+        while(l <= r) {
+            int m = (l + r) >> 1;
+            if(query(a, a + m - 1) == query(c, c + m - 1)) {
+                res = m;
+                l = m + 1;
+            } else r = m - 1;
+        }
+        return res;
+    }
+    int compare(int a, int b, int c, int d) {
+        int pre = lcp(a, b, c, d);
+        int len1 = b - a + 1, len2 = d - c + 1;
+        if(pre == len1 && pre == len2) return 0;
+        if(pre == len1) return -1;
+        if(pre == len2) return 1;
+        return s[a + pre] < s[c + pre] ? -1: 1;
+    }
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,28 +157,20 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
+    init();
 
-    auto check = [&](ll x) {
-        ll res = 0;
-        FOR(i, 1, n + 1) {
-            res += min(n, x / i);
-        }
-        return res;
-    };
-
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
-        ll m = (l + r) >> 1;
-        if(check(m) >= k) {
-            res = m;
-            r = m - 1;
-        } else {
-            l = m + 1;
-        }
+    string s; cin >> s;
+    int n = sz(s);
+    s = ' ' + s;
+    string_hashing hash_s(s, n);
+    int q; cin >> q;
+    while(q--) {
+        int a, b, l; cin >> a >> b >> l;
+        int res = hash_s.compare(a, a + l, b, b + l);
+        if(res == 0) cout << '=' << nl;
+        else if(res == -1) cout << '<' << nl;
+        else cout << '>' << nl;
     }
-
-    cout << res;
 
     return (0 ^ 0);
 

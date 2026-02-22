@@ -86,6 +86,52 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+// "abc" = ('a' * base^2 + 'b' * base^1 + 'c' * base^0) % mod
+
+const int limN = 1e6 + 5;
+const int base = 911;
+const int mod1 = 1e9 + 7;
+const int mod2 = 1e9 + 9;
+
+typedef pair<ll, ll> ii;
+ll pow1[limN], pow2[limN];
+
+void init() {
+    pow1[0] = pow2[0] = 1;
+    FOR(i, 1, limN) {
+        pow1[i] = pow1[i - 1] * base % mod1;
+        pow2[i] = pow2[i - 1] * base % mod2;
+    }
+}
+
+struct string_hashing {
+    int n;
+    string s;
+    vector<ll> dp1, dp2;
+    string_hashing() {}
+    string_hashing(string s, int n): n(n), s(s), dp1(n + 1), dp2(n + 1) {
+        FOR(i, 1, n + 1) {
+            dp1[i] = dp1[i - 1] * base % mod1 + s[i];
+            dp1[i] %= mod1;
+            dp2[i] = dp2[i - 1] * base % mod2 + s[i];
+            dp2[i] %= mod2;
+        }
+    }
+    ii query(int l, int r) {
+        if(l > r) return {0, 0};
+        ll v1 = dp1[r] - dp1[l - 1] * pow1[r - l + 1] % mod1;
+        v1 += mod1;
+        v1 %= mod1;
+        ll v2 = dp2[r] - dp2[l - 1] * pow2[r - l + 1] % mod2;
+        v2 += mod2;
+        v2 %= mod2;
+        return {v1, v2};
+    }
+    ii operator()(int l, int r) {
+        return query(l, r);
+    }
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -95,27 +141,18 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
+    init();
 
-    auto check = [&](ll x) {
-        ll res = 0;
-        FOR(i, 1, n + 1) {
-            res += min(n, x / i);
-        }
-        return res;
-    };
-
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
-        ll m = (l + r) >> 1;
-        if(check(m) >= k) {
-            res = m;
-            r = m - 1;
-        } else {
-            l = m + 1;
-        }
+    string s, t; cin >> s >> t;
+    int n = sz(s), m = sz(t);
+    s = ' ' + s;
+    t = ' ' + t;
+    string_hashing hash_s(s, n), hash_t(t, m);
+    int res = 0;
+    FOR(i, 1, n - m + 1 + 1) {
+        int j = i + m - 1;
+        if(hash_s(i, j) == hash_t(1, m)) res++;
     }
-
     cout << res;
 
     return (0 ^ 0);

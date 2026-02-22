@@ -88,12 +88,12 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 int n, m;
 const int limN = 2e5 + 5;
-vector<int> adj[limN << 1];
+vector<int> adj[limN];
 
 int timer = 0;
 int disc[limN], low[limN];
 stack<int> st;
-int onStack[limN];
+bool onStack[limN];
 int scc = 0;
 int scc_id[limN];
 void dfs(int u) {
@@ -104,7 +104,7 @@ void dfs(int u) {
         if(!disc[v]) {
             dfs(v);
             minimize(low[u], low[v]);
-        } else if(onStack[v]) {
+        } else if(onStack[v]){
             minimize(low[u], disc[v]);
         }
     }
@@ -114,16 +114,15 @@ void dfs(int u) {
             int v = st.top(); st.pop();
             scc_id[v] = scc;
             onStack[v] = 0;
-            if(v == u) break;
+            if(u == v) break;
         }
     }
 }
 
-// hàm lấy đỉnh: x > 0 trả về x, x < 0 trả về phủ định của |x| là |x| + n
-inline int getNode(int x) {
-    return x > 0 ? x : -x + n;
+inline int getId(int x) {
+    return x > 0? x: -x + n;
 }
-// hàm lấy đỉnh phủ định: phủ định của x là x + n, phủ định của -x là x
+
 inline int getNeg(int x) {
     return x > 0? x + n: -x;
 }
@@ -137,6 +136,9 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
+    // A or B = (not A -> B) and (not B -> A)
+    // vô nghiệm khi scc_id[i] == scc_id[i + n]
+
     cin >> m >> n;
     FOR(i, 1, m + 1) {
         char s1, s2;
@@ -144,25 +146,19 @@ int main(void) {
         cin >> s1 >> u >> s2 >> v;
         if(s1 == '-') u = -u;
         if(s2 == '-') v = -v;
-        // (u or v) <=> (!u -> v) and (!v -> u)
-        adj[getNeg(u)].eb(getNode(v));
-        adj[getNeg(v)].eb(getNode(u));
+        adj[getNeg(u)].eb(getId(v));
+        adj[getNeg(v)].eb(getId(u));
     }
-    // chạy tarjan cho tất cả các đỉnh (cả khẳng định và phủ định)
     FOR(u, 1, (n << 1) + 1) {
         if(!disc[u]) dfs(u);
     }
-    // kiểm tra tính thỏa mãn và khôi phục nghiệm
     char res[n + 1];
-    FOR(i, 1, n + 1) {
-        if(scc_id[i] == scc_id[i + n]) return cout << "IMPOSSIBLE", 0;
-        // gán nghiệm dựa trên scc id (id nhỏ hơn thì chọn)
-        res[i] = (scc_id[i] < scc_id[i + n]? '+': '-');
+    FOR(u, 1, n + 1) {
+        if(scc_id[u] == scc_id[u + n]) return cout << "IMPOSSIBLE", 0;
+        res[u] = scc_id[u] < scc_id[u + n] ? '+': '-';
     }
-    // in kết quả
-    FOR(i, 1, n + 1) {
-        cout << res[i] << ' ';
-    }
+    FOR(u, 1, n + 1) cout << res[u] << ' ';
+
     return (0 ^ 0);
 
 }

@@ -86,6 +86,45 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+int n, m;
+const int limN = 4e4 + 5;
+vector<int> adj[limN];
+int timer = 0;
+int disc[limN], low[limN];
+stack<int> st;
+bool onStack[limN];
+int scc = 0;
+int scc_id[limN];
+void dfs(int u) {
+    disc[u] = low[u] = ++timer;
+    st.push(u);
+    onStack[u] = 1;
+    for(const int &v: adj[u]) {
+        if(!disc[v]) {
+            dfs(v);
+            minimize(low[u], low[v]);
+        } else if(onStack[v]) {
+            minimize(low[u], disc[v]);
+        }
+    }
+    if(disc[u] == low[u]) {
+        scc++;
+        while(1) {
+            int v = st.top(); st.pop();
+            scc_id[v] = scc;
+            onStack[v] = 0;
+            if(u == v) break;
+        }
+    }
+}
+
+inline int getId(int x) {
+    return x > 0? x: -x + n;
+}
+inline int getNeg(int x) {
+    return x > 0? x + n: -x;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -95,28 +134,24 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
+    // A or B = (not A -> B) and (not B -> A)
 
-    auto check = [&](ll x) {
-        ll res = 0;
-        FOR(i, 1, n + 1) {
-            res += min(n, x / i);
-        }
-        return res;
-    };
-
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
-        ll m = (l + r) >> 1;
-        if(check(m) >= k) {
-            res = m;
-            r = m - 1;
-        } else {
-            l = m + 1;
-        }
+    cin >> m >> n;
+    FOR(i, 1, m + 1) {
+        int u, v; cin >> u >> v;
+        adj[getNeg(u)].eb(getId(v));
+        adj[getNeg(v)].eb(getId(u));
     }
-
-    cout << res;
+    FOR(u, 1, (n << 1))  {
+        if(!disc[u]) dfs(u);
+    }
+    vector<int> res;
+    FOR(u, 1, n + 1) {
+        if(scc_id[u] == scc_id[u + n]) return cout << "NO", 0;
+        if(scc_id[u] < scc_id[u + n]) res.eb(u);
+    }
+    cout << "YES" << nl << sz(res) << nl;
+    for(const int &x: res) cout << x << ' ';
 
     return (0 ^ 0);
 

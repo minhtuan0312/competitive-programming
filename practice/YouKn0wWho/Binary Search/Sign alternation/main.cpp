@@ -86,6 +86,8 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<ll, ll> ii;
+
 int main(void) {
     minhtuan0312;
 
@@ -95,17 +97,28 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
+    ll n, k; cin >> n >> k; k++;
+    ii A[n + 1];
+    ll minl = LLONG_MAX, maxr = LLONG_MIN;
+    FOR(i, 1, n + 1) {
+        ll l, r; cin >> l >> r;
+        minimize(minl, l);
+        maximize(maxr, r);
+        A[i] = {l, r};
+    }
 
     auto check = [&](ll x) {
         ll res = 0;
         FOR(i, 1, n + 1) {
-            res += min(n, x / i);
+            auto [l, r] = A[i];
+            if(x < l) continue;
+            // x >= l
+            res += min(r, x) - l + 1;
         }
         return res;
     };
 
-    ll l = 1, r = 1e18, res;
+    ll l = minl, r = maxr, res = 0;
     while(l <= r) {
         ll m = (l + r) >> 1;
         if(check(m) >= k) {
@@ -115,7 +128,6 @@ int main(void) {
             l = m + 1;
         }
     }
-
     cout << res;
 
     return (0 ^ 0);

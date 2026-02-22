@@ -95,27 +95,33 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, k; cin >> n >> k;
-
+    int n; cin >> n;
+    ll k; cin >> k;
+    ll A[n + 1], B[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+    sort(B + 1, B + 1 + n);
     auto check = [&](ll x) {
-        ll res = 0;
+        ll cnt = 0;
         FOR(i, 1, n + 1) {
-            res += min(n, x / i);
+            ll need = x - A[i];
+            cnt += upper_bound(B + 1, B + 1 + n, need) - B - 1;
         }
-        return res;
+        return cnt;
     };
 
-    ll l = 1, r = 1e18, res;
-    while(l <= r) {
+    ll l = 2, r = 2e9, res;
+    while(l <= r){
         ll m = (l + r) >> 1;
         if(check(m) >= k) {
             res = m;
             r = m - 1;
-        } else {
-            l = m + 1;
-        }
+        } else l = m + 1;
     }
-
     cout << res;
 
     return (0 ^ 0);
