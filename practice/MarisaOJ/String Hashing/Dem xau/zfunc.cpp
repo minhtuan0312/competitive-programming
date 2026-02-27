@@ -86,42 +86,25 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
+vector<int> buildZ(const string &s, int n) {
+    vector<int> z(n + 1);
+    z[1] = n;
+    int l = 1, r = 1;
+    FOR(i, 2, n + 1) {
+        int k = 1 + i - l;
+        if(i <= r) {
+            z[i] = min(r - i + 1, z[k]);
+        }
+        while(i + z[i] <= n && s[1 + z[i]] == s[i + z[i]]) {
+            z[i]++;
+        }
+        if(i + z[i] - 1 > r) {
+            l = i;
+            r = i + z[i] - 1;
         }
     }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
-        }
-    }
+    return z;
 }
-
-vector<int> dag[limN];
-bitset<limN> reach[limN];
 
 int main(void) {
     minhtuan0312;
@@ -132,38 +115,17 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n >> m >> q;
-    FOR(i, 1, m + 1) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
+    string s, t; cin >> s >> t;
+    string c = t + '#' + s;
+    int n = sz(c);
+    c = ' ' + c;
+    vector<int> z = buildZ(c, n);
+    int res = 0;
+    FOR(i, 1, n + 1) {
+        if(z[i] == sz(t)) res++;
     }
+    cout << res;
 
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
-    }
-
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
-            }
-        }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
-        }
-    }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
-    }
 
     return (0 ^ 0);
 

@@ -86,43 +86,44 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
-        }
+struct team{
+    int solved, penalty;
+};
+inline bool cmp(const team &x, const team &y) {
+    return x.solved == y.solved? x.penalty < y.penalty : x.solved > y.solved;
+}
+const int limN = 1e5 + 5;
+team teams[limN];
+int n, m;
+int get_rank() {
+    int better = 0;
+    FOR(i, 2, n + 1) {
+        if(cmp(teams[i], teams[1])) better++;
     }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
-        }
-    }
+    return better + 1;
+    // số lượng (x.solved == 1.solved && x.penalty < 1.penalty) + số lượng (x.solved > 1.solved) + 1
 }
 
-vector<int> dag[limN];
-bitset<limN> reach[limN];
+struct fenwick_tree{
+    int n;
+    vector<ll> BIT;
+    fenwick_tree() {}
+    fenwick_tree(int n): n(n), BIT(n + 1) {}
+    void upd(int idx, ll val) {
+        for(; idx <= n; idx += idx & -idx) {
+            BIT[idx] += val;
+        }
+    }
+    ll query(int idx) {
+        ll res = 0;
+        for(; idx; idx -= idx & -idx) {
+            res += BIT[idx];
+        }
+        return res;
+    }
+};
 
+typedef pair<int, int> ii;
 int main(void) {
     minhtuan0312;
 
@@ -131,40 +132,40 @@ int main(void) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
-
-    cin >> n >> m >> q;
+    cin >> n >> m;
+    vector<team> compress;
+    compress.pb({0, 0});
+    vector<ii> events;
     FOR(i, 1, m + 1) {
         int u, v; cin >> u >> v;
-        adj[u].eb(v);
+        events.eb(u, v);
+        teams[u].solved++;
+        teams[u].penalty += v;
+        compress.eb(teams[u]);
     }
+    sort(all(compress), cmp);
+    states.erase(unique(all(states), [](const team &a, const team &b){
+        return a.solved == b.solved && a.penalty == b.penalty;
+    }), states.end());
 
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
-    }
+    auto get_id = [&](int i) {
+        return lower_bound(all(compress), teams[i], cmp) - compress.begin() + 1;
+    };
+    memset(teams, 0, sizeof teams); // bắt đầu mô phỏng thật
+    fenwick_tree fw(sz(compress));
+    fw.upd(get_id(0), n); // ban đầu cả n đội đều (0, 0)
+    for(const auto [u, v]: events) {
 
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
-            }
-        }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
-        }
-    }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
-    }
+        fw.upd(get_id(u), -1);
 
+        teams[u].solved++;
+        teams[u].penalty += v;
+
+        fw.upd(get_id(u), 1);
+
+        cout << fw.query(get_id(1) - 1) + 1 << nl;
+
+    }
     return (0 ^ 0);
 
 }

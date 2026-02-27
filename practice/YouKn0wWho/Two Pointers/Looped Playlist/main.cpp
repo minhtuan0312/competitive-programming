@@ -23,8 +23,9 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,43 +87,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
-        }
-    }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
-        }
-    }
-}
-
-vector<int> dag[limN];
-bitset<limN> reach[limN];
-
 int main(void) {
     minhtuan0312;
 
@@ -132,38 +96,35 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n >> m >> q;
-    FOR(i, 1, m + 1) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
+    int n; cin >> n;
+    ll p; cin >> p;
+    ll A[n + 1];
+    ll s = 0;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        s += A[i];
     }
+    ll quo = p / s;
+    ll rem = p % s;
+    if(rem == 0) return cout << 1 << ' ' << 1ll* quo * n, 0;
 
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
+    ll AA[n << 1 | 1];
+    FOR(i, 1, n + 1) {
+        AA[i] = AA[i + n] = A[i];
     }
-
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
+    int j = 1;
+    ll cur = 0;
+    int res = INT_MAX, res_idx = -1;
+    FOR(i, 1, (n << 1 | 1)) {
+        cur += AA[i];
+        while(j <= i && cur >= rem) {
+            if(minimize(res, i - j + 1)) {
+                res_idx = (i <= n? i: i - n);
             }
-        }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
+            cur -= AA[j++];
         }
     }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
-    }
+    cout << res_idx << ' ' << 1ll * quo * n + res;
 
     return (0 ^ 0);
 

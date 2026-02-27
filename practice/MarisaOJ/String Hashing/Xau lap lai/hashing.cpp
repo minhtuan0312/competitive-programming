@@ -101,16 +101,16 @@ void init() {
 }
 
 typedef pair<ll, ll> ii;
-struct string_hashing{
+struct string_hashing {
     int n;
     string s;
     vector<ll> dp1, dp2;
     string_hashing() {}
-    string_hashing(const string &s, int n): s(s), n(n), dp1(n + 1), dp2(n + 1) {
+    string_hashing(string s, int n): s(s), n(n), dp1(n + 1), dp2(n + 1) {
         FOR(i, 1, n + 1) {
-            dp1[i] = dp1[i - 1] % mod1 * base + s[i];
+            dp1[i] = dp1[i - 1] * base % mod1 + s[i];
             dp1[i] %= mod1;
-            dp2[i] = dp2[i - 1] % mod2 * base + s[i];
+            dp2[i] = dp2[i - 1] * base % mod2 + s[i];
             dp2[i] %= mod2;
         }
     }
@@ -124,13 +124,11 @@ struct string_hashing{
         v2 %= mod2;
         return {v1, v2};
     }
-    ii operator()(int l, int r) {
+    ii operator() (int l, int r) {
         return query(l, r);
     }
 };
 
-vector<int> adj[2005];
-bitset<2005> reach[2005];
 int main(void) {
     minhtuan0312;
 
@@ -140,50 +138,16 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    init(); // init string hashing
-    int q; cin >> q;
+    init();
+
     string s; cin >> s;
-    set<ii> hashes;
-    vector<int> lens;
-    while(q--) {
-        string t; cin >> t;
-        int n = sz(t);
-        t = ' ' + t;
-        string_hashing hash_t(t, n);
-        hashes.insert(hash_t(1, n));
-        lens.eb(n);
-    }
-    sort(all(lens));
-    lens.erase(unique(all(lens)), lens.end());
     int n = sz(s);
     s = ' ' + s;
     string_hashing hash_s(s, n);
-
-    //DAG trick: chuyển hóa bài toán thành DAG với n đỉnh đại diện cho dp[len]: len tối đa ghép được bắt đầu tại u
-    FOR(u, 0, n + 1) {
-        for(const int &len: lens) {
-            int v = u + len;
-            if(v > n) continue;
-            if(hashes.count(hash_s(u + 1, v))) {
-                adj[u].eb(v); // có cạnh từ u sang v
-            }
-        }
+    FOR(len, 1, n + 1) {
+        if(hash_s(1, n - len) == hash_s(len + 1, n)) return cout << s.substr(1, len), 0;
     }
-    int res = 0;
-    for(int u = n; u >= 0; u--) { // duyệt ngược để tính trước v (topo ngược)
-        reach[u][u] = 1; // u luôn đi được đến chính nó
-        for(const int &v: adj[u]) {
-            reach[u] |= reach[v]; // O(n/64)
-        }
-        // tìm điểm xa nhất có thể đến được từ u
-        for(int v = n; v >= u; v--) {
-            if(reach[u][v]) {
-                maximize(res, v - u);
-                break;
-            }
-        }
-    }
-    cout << res;
+    cout << s.substr(1, n);
 
     return (0 ^ 0);
 

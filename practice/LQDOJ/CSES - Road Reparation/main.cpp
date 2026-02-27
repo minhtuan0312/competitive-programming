@@ -23,8 +23,9 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,48 +87,31 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+typedef pair<ll, ll> ii;
+int n, m;
 const int limN = 1e5 + 5;
-const int base = 911;
-const int mod1 = 1e9 + 7;
-const int mod2 = 1e9 + 9;
+vector<ii> adj[limN];
+ll dist[limN];
+void dijkstra() {
+    memset(dist, 0x3f, sizeof dist);
+    priority_queue<ii, vector<ii>, greater<ii>> pq;
+    FOR(i, 1, n + 1) {
+        pq.push({0, i});
+    }
+    while(!pq.empty()) {
 
-ll pow1[limN], pow2[limN];
-void init() {
-    pow1[0] = pow2[0] = 1;
-    FOR(i, 1, limN) {
-        pow1[i] = pow1[i - 1] * base % mod1;
-        pow2[i] = pow2[i - 1] * base % mod2;
+        auto [d, u] = pq.top(); pq.pop();
+        if (d > dist[u]) continue;
+
+        for(const auto &[v, w]: adj[u]) {
+            ll cost = min(dist[u], d + w);
+            if(minimize(dist[v], cost)) {
+                pq.push({cost, v});
+            }
+        }
+
     }
 }
-
-typedef pair<ll, ll> ii;
-struct string_hashing {
-    int n;
-    string s;
-    vector<ll> dp1, dp2;
-    string_hashing() {}
-    string_hashing(string s, int n): s(s), n(n), dp1(n + 1), dp2(n + 1) {
-        FOR(i, 1, n + 1) {
-            dp1[i] = dp1[i - 1] * base % mod1 + s[i];
-            dp1[i] %= mod1;
-            dp2[i] = dp2[i - 1] * base % mod2 + s[i];
-            dp2[i] %= mod2;
-        }
-    }
-    ii query(int l, int r) {
-        if(l > r) return {0, 0};
-        ll v1 = dp1[r] - dp1[l - 1] * pow1[r - l + 1] % mod1;
-        v1 += mod1;
-        v1 %= mod1;
-        ll v2 = dp2[r] - dp2[l - 1] * pow2[r - l + 1] % mod2;
-        v2 += mod2;
-        v2 %= mod2;
-        return {v1, v2};
-    }
-    ii operator() (int l, int r) {
-        return query(l, r);
-    }
-};
 
 int main(void) {
     minhtuan0312;
@@ -138,19 +122,15 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    init();
-
-    string s; cin >> s;
-    int n = sz(s);
-    s = ' ' + s;
-    string_hashing hash_s(s, n);
-
-    FOR(len, 1, n + 1) {
-
-        int k = n - len;
-        if (k == 0) return cout << s, 0;
-        if(hash_s(1, k) == hash_s(n - k + 1, n)) return cout << s.substr(1, len), 0;
+    cin >> n >> m;
+    FOR(i, 1, m + 1) {
+        int u, v, w; cin >> u >> v >> w;
+        adj[u].eb(v, w);
+        adj[v].eb(u, w);
     }
+
+    dijkstra();
+    cout << dist[n];
 
     return (0 ^ 0);
 

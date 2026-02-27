@@ -86,43 +86,6 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
-        }
-    }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
-        }
-    }
-}
-
-vector<int> dag[limN];
-bitset<limN> reach[limN];
-
 int main(void) {
     minhtuan0312;
 
@@ -132,38 +95,24 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n >> m >> q;
-    FOR(i, 1, m + 1) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
-    }
+    int n, m; cin >> n >> m;
+    ll A[n + 1], B[m + 1];
+    FOR(i, 1, n + 1) cin >> A[i];
+    FOR(i, 1, m + 1) cin >> B[i];
 
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
+    int i = 1, j = 1;
+    ll res = 0;
+    while(i <= n && j <= m) {
+        if(A[i] == B[j]) {
+            ll v = A[i];
+            ll cnt1 = 0, cnt2 = 0;
+            while(i <= n && A[i] == v) cnt1++, i++;
+            while(j <= m && B[j] == v) cnt2++, j++;
+            res += cnt1 * cnt2;
+        } else if (A[i] < B[j]) i++;
+        else j++;
     }
-
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
-            }
-        }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
-        }
-    }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
-    }
+    cout << res;
 
     return (0 ^ 0);
 

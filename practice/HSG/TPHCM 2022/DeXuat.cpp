@@ -23,8 +23,9 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,42 +87,42 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
-        }
-    }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
+typedef pair<ll, ll> ii;
+ll n, m, k, s, t;
+const ll limN = 1e4 + 5;
+vector<ii> adj[limN], rev_adj[limN];
+ll dist_s[limN], dist_t[limN];
+void dijkstra(ll s, ll dist[]) {
+    fill(dist + 1, dist + 1 + n, LLONG_MAX);
+    priority_queue<ii, vector<ii>, greater<ii>> pq;
+    pq.push({0, s});
+    dist[s] = 0;
+    while(!pq.empty()) {
+        auto [d, u] = pq.top(); pq.pop();
+        if(d > dist[u]) continue;
+        for(const auto [v, w]: adj[u]) {
+            if(minimize(dist[v], w + d)) {
+                pq.push({w + d, v});
+            }
         }
     }
 }
 
-vector<int> dag[limN];
-bitset<limN> reach[limN];
+void dijkstra_rev(ll s, ll dist[]) {
+    fill(dist + 1, dist + 1 + n, LLONG_MAX);
+    priority_queue<ii, vector<ii>, greater<ii>> pq;
+    pq.push({0, s});
+    dist[s] = 0;
+    while(!pq.empty()) {
+        auto [d, u] = pq.top(); pq.pop();
+        if(d > dist[u]) continue;
+        for(const auto [v, w]: rev_adj[u]) {
+            if(minimize(dist[v], w + d)) {
+                pq.push({w + d, v});
+            }
+        }
+    }
+}
 
 int main(void) {
     minhtuan0312;
@@ -132,39 +133,28 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n >> m >> q;
+    cin >> n >> m >> k >> s >> t;
     FOR(i, 1, m + 1) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
+        ll u, v, w; cin >> u >> v >> w;
+        adj[u].eb(v, w);
+        rev_adj[v].eb(u, w);
     }
 
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
-    }
-
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
-            }
+    dijkstra(s, dist_s);
+    dijkstra_rev(t, dist_t);
+    ll st = dist_s[t];
+    ll best = LLONG_MAX;
+    FOR(i, 1, k + 1) {
+        ll u, v, w; cin >> u >> v >> w;
+        if(dist_s[u] != LLONG_MAX && dist_t[v] != LLONG_MAX) {
+            minimize(best, dist_s[u] + dist_t[v] + w);
         }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
+        if(dist_s[v] != LLONG_MAX && dist_t[u] != LLONG_MAX) {
+            minimize(best, dist_s[v] + dist_t[u] + w);
         }
     }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
-    }
-
+    ll res = min(best, st);
+    cout << (res == LLONG_MAX? -1: res);
     return (0 ^ 0);
 
 }

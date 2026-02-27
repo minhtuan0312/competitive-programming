@@ -18,8 +18,9 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) return x = y, 1;
+    return 0;
 }
 
 template<class T>
@@ -86,42 +87,52 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-int n, m, q;
-const int limN = 5e4 + 5;
-vector<int> adj[limN];
-
-int timer = 0;
-int disc[limN], low[limN];
-stack<int> st;
-bool onStack[limN];
-int scc = 0;
-int scc_id[limN];
-
-void dfs(int u) {
-    disc[u] = low[u] = ++timer;
-    st.push(u);
-    onStack[u] = 1;
-    for(const int &v: adj[u]) {
-        if(!disc[v]) {
-            dfs(v);
-            minimize(low[u], low[v]);
-        } else if(onStack[v]) {
-            minimize(low[u], disc[v]);
-        }
+struct Node {
+    int s, e;
+    bool operator < (const Node &other) const {
+        return s < other.s;
     }
-    if(disc[u] == low[u]) {
-        scc++;
-        while(1) {
-            int v = st.top(); st.pop();
-            scc_id[v] = scc;
-            onStack[v] = 0;
-            if(u == v) break;
-        }
+};
+
+void solve() {
+
+    int m; cin >> m;
+    int l, r;
+    vector<Node> nodes;
+    int n = 0;
+    while(cin >> l >> r) {
+        if(l == 0 && r == 0) break;
+        n++;
+        nodes.pb({l, r});
     }
+    sort(all(nodes));
+    int i = 0;
+    int current_limit = 0;
+    vector<Node> res;
+    while(current_limit < m) {
+        int best_reach = INT_MIN;
+        int best_id = -1;
+        bool ok = 0;
+        while(i < n && nodes[i].s <= current_limit) {
+            if(maximize(best_reach, nodes[i].e)) {
+                best_id = i;
+            }
+            i++;
+            ok = 1;
+        }
+        if(!ok || best_reach <= current_limit) {
+            return cout << 0 << nl, void();
+        }
+        current_limit = best_reach;
+        res.pb(nodes[best_id]);
+    }
+    cout << sz(res) << nl;
+    sort(all(res), [&](Node &x, Node &y){
+         return x.s < y.s;
+         });
+    for(const auto &[l, r]: res) cout << l << ' ' << r << nl;
+
 }
-
-vector<int> dag[limN];
-bitset<limN> reach[limN];
 
 int main(void) {
     minhtuan0312;
@@ -132,37 +143,9 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    cin >> n >> m >> q;
-    FOR(i, 1, m + 1) {
-        int u, v; cin >> u >> v;
-        adj[u].eb(v);
-    }
-
-    FOR(u, 1, n + 1) {
-        if(!disc[u]) dfs(u);
-    }
-
-    FOR(u, 1, n + 1) {
-        if(!scc_id[u]) continue;
-        for(const int &v: adj[u]) {
-            if(scc_id[v] && scc_id[u] != scc_id[v]) {
-                dag[scc_id[u]].eb(scc_id[v]);
-            }
-        }
-        auto tmp = dag[scc_id[u]]; // loại bỏ các cạnh trùng để tối ưu thời gian
-        tmp.erase(unique(all(tmp)), tmp.end());
-    }
-    FOR(u, 1, scc + 1) { // topo ngược
-        reach[u][u] = 1; // u đi được đến chính nó
-        for(const int &v: dag[u]) {
-            reach[u] |= reach[v];
-        }
-    }
-    while(q--) {
-        int u, v; cin >> u >> v;
-        u = scc_id[u];
-        v = scc_id[v];
-        cout << (reach[u][v] ? "YES": "NO") << nl;
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
 
     return (0 ^ 0);
