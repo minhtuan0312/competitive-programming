@@ -11,15 +11,15 @@ using namespace std;
 #define minhtuan0312 ios_base::sync_with_stdio(false); cin.tie(0); cout.tie(0)
 #define sz(x) ((int)(x).size())
 #define pb push_back
-#define eb emplace_back
 #define fi first
 #define se second
 
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) return x = y, 1;
+    return 0;
 }
 
 template<class T>
@@ -86,31 +86,47 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
-    }
-    cout << "yes" << nl;
-}
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "REMOVE"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    ll A[n + 1], B[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+    ll dp[n + 1][n + 1];
+    FOR(i, 0, n + 1) {
+        FOR(j, 0, n + 1) dp[i][j] = LLONG_MIN;
+    }
+    FOR(i, 1, n + 1) {
+        dp[i][i] = A[i] * B[i];
+    }
+    FOR(i, 1, n) {
+        dp[i][i + 1] = A[i] * B[i + 1] + A[i + 1] * B[i];
+    }
+    ll res = LLONG_MIN, res_i, res_j;
+    FOR(len, 3, n + 1){
+        FOR(i, 1, n - len + 1 + 1) {
+            int j = i + len - 1;
+            if(dp[i + 1][j - 1] == LLONG_MIN) continue;
+            maximize(dp[i][j], dp[i + 1][j - 1] + A[i] * B[j] + A[j] * B[i]);
+            if(maximize(res, dp[i][j])) {
+                res_i = i;
+                res_j = j;
+            }
+        }
+    }
+    cout << res_i - 1 << ' ' << n - res_j << nl << res;
+
 
     return (0 ^ 0);
 

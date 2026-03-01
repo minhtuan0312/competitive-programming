@@ -86,31 +86,31 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
-    }
-    cout << "yes" << nl;
-}
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "GOODARR"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    ll A[n + 1];
+    ll pre[n + 1];
+    pre[0] = 0;
+    map<ll, ll> counter;
+    counter[0] = 1;
+    ll res = 0;
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+        pre[i] = pre[i - 1] + A[i] - 1;
+        if(counter.count(pre[i])) {
+            res += counter[pre[i]];
+        }
+        counter[pre[i]]++;
+    }
+    cout << res;
 
     return (0 ^ 0);
 

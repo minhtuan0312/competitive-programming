@@ -86,32 +86,72 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
+struct Node{
+    ll v, cnt;
+    bool operator < (const Node &other) const {
+        return v < other.v;
     }
-    cout << "yes" << nl;
-}
+};
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "CNTSEQ"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    Node A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].v;
+    }
 
+    stack<ll> st;
+    ll closest_right[n + 1];
+    FOR(i, 1, n + 1) {
+        while(!st.empty() && A[st.top()].v <= A[i].v) {
+            ll u = st.top(); st.pop();
+            closest_right[u] = i;
+        }
+        st.push(i);
+    }
+    while(!st.empty()) {
+        ll u = st.top(); st.pop();
+        closest_right[u] = n + 1;
+    }
+    ll closest_left[n + 1];
+    FORd(i, 1, n + 1) {
+        while(!st.empty() && A[st.top()].v < A[i].v) {
+            ll u = st.top(); st.pop();
+            closest_left[u] = i;
+        }
+        st.push(i);
+    }
+    while(!st.empty()) {
+        ll u = st.top(); st.pop();
+        closest_left[u] = 0;
+    }
+    FOR(i, 1, n + 1) {
+        A[i].cnt = (i - closest_left[i]) * (closest_right[i] - i);
+    }
+    sort(A + 1, A + 1 + n);
+    A[0].cnt = 0;
+    FOR(i, 1, n + 1) {
+        A[i].cnt = A[i - 1].cnt + A[i].cnt;
+    }
+    int q; cin >> q;
+    while(q--) {
+        ll l, r; cin >> l >> r;
+        auto itR = upper_bound(A + 1, A + 1 + n, r, [&](ll val, const Node &node){
+                              return val < node.v;
+                              }) - A - 1;
+        auto itL = lower_bound(A + 1, A + 1 + n, l, [&](const Node &node, ll val){
+                              return node.v < val;
+                              }) - A - 1;
+        cout << A[itR].cnt - A[itL].cnt << nl;
+    }
     return (0 ^ 0);
 
 }

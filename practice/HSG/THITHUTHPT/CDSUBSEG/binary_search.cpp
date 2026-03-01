@@ -86,24 +86,59 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
+const int limN = 1000005;
+const int limLOG = 21;
+int st[limN][limLOG];
+struct sparse_table {
+    int n, max_log;
+    sparse_table() {}
+    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1) {
+        FOR(i, 1, n + 1) st[i][0] = abs(A[i]);
+        FOR(j, 1, max_log) {
+            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
+                st[i][j] = __gcd(st[i][j - 1], st[i + (1 << (j - 1))][j - 1]);
+            }
         }
-        mark[s[i] - 'a'] = i;
     }
-    cout << "yes" << nl;
+    ll query(int l, int r) {
+        if(l > r) return 0;
+        int j = __lg(r - l + 1);
+        return __gcd(st[l][j], st[r - (1 << j) + 1][j]);
+    }
+};
+
+void solve() {
+    int n; cin >> n;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    sparse_table sparse(A, n);
+    auto check = [&](int k) -> bool {
+        int ok = 0;
+        FOR(i, 1, n - k + 1 + 1) {
+            int j = i + k - 1;
+            int res = sparse.query(i, j);
+            if(res > 1 || res == 0) ok = 1;
+            if(ok) break;
+        }
+        return ok;
+    };
+    int l = 1, r = n, res = 0;
+    while(l <= r) {
+        int m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else r = m - 1;
+    }
+    cout << res << nl;
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "CDSUBSEG"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);

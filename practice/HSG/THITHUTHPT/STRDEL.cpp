@@ -87,23 +87,38 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 void solve() {
-    string s, t; cin >> s >> t;
+    string s; cin >> s;
     int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
+    s = ' ' + s;
+    ll dp[n + 1][n + 1];
     FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
+        FOR(j, 1, n + 1) {
+            dp[i][j] = LLONG_MAX;
         }
-        mark[s[i] - 'a'] = i;
     }
-    cout << "yes" << nl;
+    FOR(i, 0, n + 1) {
+        dp[i][i] = 1;
+        if(i + 1 <= n) dp[i][i + 1] = (s[i] == s[i + 1]? 1: 2);
+    }
+    FOR(len, 3, n + 1) {
+        FOR(i, 1, n - len + 1 + 1) {
+            int j = i + len - 1;
+            if(s[i] == s[j]) {
+                minimize(dp[i][j], dp[i + 1][j - 1]);
+            } else {
+                FOR(k, i, j) {
+                    minimize(dp[i][j], dp[i][k] + dp[k + 1][j]);
+                }
+            }
+        }
+    }
+    cout << dp[1][n] << nl;
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "STRDEL"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);

@@ -86,31 +86,48 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
+int n;
+const int limN = 100005;
+vector<int> adj[limN];
+ll dist[limN];
+void dfs(int u, int p) {
+    for(const int &v: adj[u]) {
+        if(v == p) continue;
+        dist[v] = dist[u] + 1;
+        dfs(v, u);
     }
-    cout << "yes" << nl;
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "CHIATAY"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    cin >> n;
+    FOR(i, 1, n) {
+        int u, v; cin >> u >> v;
+        adj[u].eb(v);
+        adj[v].eb(u);
+    }
+
+    dist[1] = 0;
+    dfs(1, 0);
+    int u = 1;
+    FOR(i, 1, n + 1) {
+        if(dist[i] > dist[u]) u = i;
+    }
+
+    dist[u] = 0;
+    dfs(u, 0);
+    int v = u;
+    FOR(i, 1, n + 1) {
+        if(dist[i] > dist[v]) v = i;
+    }
+    cout << dist[v];
 
     return (0 ^ 0);
 

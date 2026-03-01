@@ -86,31 +86,47 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
-    }
-    cout << "yes" << nl;
-}
-
+const int offset = 1e6;
+const int limN = 2e6 + 5;
+int cnt[limN];
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "3SUM"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n, q; cin >> n >> q;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    ll dp[n + 1][n + 1];
+    memset(dp, 0, sizeof dp);
+    FOR(i, 1, n) {
+        FOR(j, i + 1, n + 1) {
+            ll target = -(A[i] + A[j]);
+            if(target + offset >= 0 && target + offset <= 2000000) {
+                dp[i][j] += cnt[target + offset];
+            }
+            cnt[A[j] + offset]++;
+        }
+        FOR(j, i + 1, n + 1) {
+            cnt[A[j] + offset] = 0;
+        }
+    }
+    FOR(len, 3, n + 1) {
+        FOR(i, 1, n - len + 1 + 1) {
+            int j = i + len - 1;
+            dp[i][j] += dp[i + 1][j] + dp[i][j - 1] - dp[i + 1][j - 1];
+        }
+    }
+    while(q--) {
+        int l, r; cin >> l >> r;
+        cout << dp[l][r] << nl;
+    }
 
     return (0 ^ 0);
 

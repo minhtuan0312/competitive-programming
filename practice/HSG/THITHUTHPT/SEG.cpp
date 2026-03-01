@@ -86,31 +86,65 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-void solve() {
-    string s, t; cin >> s >> t;
-    int n = sz(s);
-    s = ' ' + s, t = ' ' + t;
-    int mark[26] = {0};
-    FOR(i, 1, n + 1) {
-        if(s[i] != t[i]) {
-            if(!mark[t[i] - 'a']) return cout << "no" << nl, void();
-        }
-        mark[s[i] - 'a'] = i;
+struct Point {
+    int l, r;
+    int id;
+    bool operator < (const Point &other) const {
+        return l == other.l? r > other.r : l < other.l;
     }
-    cout << "yes" << nl;
+};
+
+inline bool is_the_same(const Point &a, const Point &b) {
+    return a.l == b.l && a.r == b.r;
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "STRING"
+    #define TASK "SEG"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    Point A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i].l >> A[i].r;
+        A[i].id = i;
+    }
+    sort(A + 1, A + 1 + n);
+
+    bool contains[n + 1] = {0};
+    bool contained[n + 1] = {0};
+
+    int max_r = 0;
+    FOR(i, 1, n + 1) {
+        if(max_r >= A[i].r) {
+            contained[A[i].id] = 1;
+        }
+        if(i > 1 && is_the_same(A[i], A[i - 1])) {
+            contained[A[i].id] = 1;
+            contained[A[i - 1].id] = 1;
+        }
+        maximize(max_r, A[i].r);
+    }
+
+    int min_r = INT_MAX;
+    for(int i = n; i >= 1; i--) {
+        if(min_r <= A[i].r) {
+            contains[A[i].id] = 1;
+        }
+        if(i < n && is_the_same(A[i], A[i + 1])) {
+            contains[A[i].id] = 1;
+            contains[A[i + 1].id] = 1;
+        }
+        minimize(min_r, A[i].r);
+    }
+
+    FOR(i, 1, n + 1) cout << contains[i] << ' ';
+    cout << nl;
+    FOR(i, 1, n + 1) cout << contained[i] << ' ';
 
     return (0 ^ 0);
 
