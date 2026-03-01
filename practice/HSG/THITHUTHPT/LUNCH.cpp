@@ -18,9 +18,8 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-inline bool maximize(T &x, const T &y) {
-    if (x < y) return x = y, 1;
-    return 0;
+void maximize(T &x, const T &y) {
+    if (x < y) x = y;
 }
 
 template<class T>
@@ -87,47 +86,52 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+struct Node{
+    ll taste, spicy;
+};
+
 int main(void) {
     minhtuan0312;
 
-    #define TASK "REMOVE"
+    #define TASK "LUNCH"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n; cin >> n;
-    ll A[n + 1], B[n + 1];
+    int n, m; cin >> n >> m;
+    Node A[n + 1];
+    ll min_spicy = LLONG_MAX;
+    ll max_spicy = LLONG_MIN;
     FOR(i, 1, n + 1) {
-        cin >> A[i];
+        cin >> A[i].taste >> A[i].spicy;
+        maximize(max_spicy, A[i].spicy);
+        minimize(min_spicy, A[i].spicy);
     }
-    FOR(i, 1, n + 1) {
-        cin >> B[i];
-    }
-    ll dp[n + 1][n + 1];
-    FOR(i, 0, n + 1) {
-        FOR(j, 0, n + 1) dp[i][j] = LLONG_MIN;
-    }
-    FOR(i, 1, n + 1) {
-        dp[i][i] = A[i] * B[i];
-    }
-    FOR(i, 1, n) {
-        dp[i][i + 1] = A[i] * B[i + 1] + A[i + 1] * B[i];
-    }
-    ll res = LLONG_MIN, res_i, res_j;
-    FOR(len, 3, n + 1){
-        FOR(i, 1, n - len + 1 + 1) {
-            int j = i + len - 1;
-            if(dp[i + 1][j - 1] == LLONG_MIN) continue;
-            maximize(dp[i][j], dp[i + 1][j - 1] + A[i] * B[j] + A[j] * B[i]);
-            if(maximize(res, dp[i][j])) {
-                res_i = i;
-                res_j = j;
+
+    auto check = [&](const ll k) -> bool {
+        ll cur = 0;
+        FOR(i, 1, n + 1) {
+            if(A[i].spicy <= k) {
+                cur += A[i].taste;
+                if(cur >= m) return 1;
+            } else {
+                cur = 0;
             }
         }
-    }
-    cout << res_i - 1 << ' ' << n - res_j << nl << res;
+        return 0;
+    };
 
+    ll l = min_spicy, r = max_spicy, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else l = m + 1;
+
+    }
+    cout << res;
 
     return (0 ^ 0);
 
