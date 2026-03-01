@@ -86,50 +86,69 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
-}
-
+typedef pair<ll, ll> ii;
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "PRJCHAIN"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    ll A[n + 1], B[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+
+    vector<ii> lose, win;
+    FOR(i, 1, n + 1) {
+        if(A[i] <= B[i]) {
+            win.eb(A[i], B[i]);
+        } else {
+            lose.eb(A[i], B[i]);
+        }
+    }
+
+    sort(all(win), [&](const ii &a, const ii &b){
+         return a.fi < b.fi;
+         });
+    sort(all(lose), [&](const ii &a, const ii &b){
+         return a.se > b.se;
+         });
+
+    auto check = [&](ll x)  {
+
+        for(const auto [cost, profit]: win) {
+            x -= cost;
+            if(x < 0) return 0;
+            x += profit;
+        }
+
+        for(const auto [cost, profit]: lose) {
+            x -= cost;
+            if(x < 0) return 0;
+            x += profit;
+        }
+
+        return 1;
+
+    };
+
+    ll l = 0, r = 1e18, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else l = m + 1;
+    }
+    cout << res;
+
 
     return (0 ^ 0);
 

@@ -86,50 +86,43 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
+const int limN = 1e5 + 5;
+ll dp[limN][2][13];
 
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+ll f(int idx, int lz, int rem, int n) {
+    if(idx == n + 1) {
+        return rem == 0;
     }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
+    auto &res = dp[idx][lz][rem];
+    if(res != -1) return res;
+    ll ans = 0;
+    FOR(digit, 0, 9 + 1) {
+        if(digit == 1 || digit == 3) continue;
+        int new_lz = lz && (digit == 0);
+        if(new_lz) continue;
+        int new_rem = (rem * 10 + digit) % 13;
+        ans += f(idx + 1, new_lz, new_rem, n);
+        ans %= mod;
     }
+    return res = ans;
+}
+
+ll solve(int n) {
+    memset(dp, -1, sizeof dp);
+    return f(1, 1, 0, n);
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "NUM13"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    cout << solve(n);
 
     return (0 ^ 0);
 

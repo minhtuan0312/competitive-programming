@@ -23,8 +23,9 @@ void maximize(T &x, const T &y) {
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,50 +87,99 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+int n, m;
+const int limN = 105;
+struct Edge{
+    int u, v;
+    ll w;
+};
+typedef pair<ll, ll> ii;
+vector<ii> adj[limN];
+ll dist[limN], trace[limN];
+void dijkstra(int s) {
+    FOR(i, 1, n + 1) {
+        dist[i] = LLONG_MAX;
+        trace[i] = -1;
+    }
+    priority_queue<ii, vector<ii>, greater<ii>> pq;
+    pq.push({0, s});
+    dist[s] = 0;
+    while(!pq.empty()) {
+        auto [d, u] = pq.top(); pq.pop();
+        if(d > dist[u]) continue;
+        for(const auto &[v, w]: adj[u]) {
+            if(minimize(dist[v], d + w)){
+                trace[v] = u;
+                pq.push({d + w, v});
             }
         }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
     }
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "RBLOCK"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    cin >> n >> m;
+    vector<Edge> edges;
+    FOR(i, 1, m + 1) {
+        int u, v, w; cin >> u >> v >> w;
+        adj[u].pb({v, w});
+        adj[v].pb({u, w});
+        edges.pb({u, v, w});
+    }
+
+    dijkstra(1);
+
+    ll og = dist[n];
+    int last = n;
+    vector<ii> roads;
+    while(last != 1) {
+        roads.eb(trace[last], last);
+        last = trace[last];
+    }
+    ll res = 0;
+    for(const auto&[u, v]: roads) {
+
+        ll old_w = 0;
+        for(auto &e: adj[u]) {
+            if(e.fi == v) {
+                old_w = e.se;
+                e.se *= 2;
+                break;
+            }
+        }
+        for(auto &e: adj[v]) {
+            if(e.fi == u) {
+                e.se *= 2;
+                break;
+            }
+        }
+        dijkstra(1);
+        ll new_dist = dist[n];
+        if(new_dist != LLONG_MAX) {
+            maximize(res, new_dist - og);
+        }
+        for(auto &e: adj[u]) {
+            if(e.fi == v) {
+                e.se = old_w;
+                break;
+            }
+        }
+        for(auto &e: adj[v]) {
+            if(e.fi == u) {
+                e.se = old_w;
+                break;
+            }
+        }
+    }
+
+    cout << res;
 
     return (0 ^ 0);
 

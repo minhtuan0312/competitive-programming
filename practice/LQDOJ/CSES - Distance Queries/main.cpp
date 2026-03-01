@@ -86,37 +86,46 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
+int n, q;
+const int limLOG = 21;
+const int limN = 2e5 + 5;
+vector<int> adj[limN];
+int dist[limN], up[limN][limLOG];
+
+void dfs(int u, int p) {
+
+    up[u][0] = p;
+    FOR(j, 1, limLOG) {
+        up[u][j] = up[up[u][j - 1]][j - 1];
+    }
+    for(const int &v: adj[u]) {
+        if(v == p) continue;
+        dist[v] = dist[u] + 1;
+        dfs(v, u);
+    }
+
+}
+
+int get_kth(int u, int k) {
+    for(int j = limLOG - 1; j >= 0; j--) {
+        if(bit(k, j)) {
+            u = up[u][j];
         }
     }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
+    return u;
+}
 
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+int get_lca(int u, int v) {
+    if(dist[u] < dist[v]) swap(u, v);
+    u = get_kth(u, dist[u] - dist[v]);
+    if(u == v) return u;
+    for(int j = limLOG - 1; j >= 0; j--) {
+        if(up[u][j] != up[v][j]) {
+            u = up[u][j];
+            v = up[v][j];
+        }
     }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
+    return up[u][0];
 }
 
 int main(void) {
@@ -128,8 +137,17 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    cin >> n >> q;
+    FOR(i, 1, n) {
+        int u, v; cin >> u >> v;
+        adj[u].eb(v);
+        adj[v].eb(u);
+    }
+    dfs(1, 0);
+    while(q--) {
+        int a, b; cin >> a >> b;
+        cout << dist[a] + dist[b] - 2 * dist[get_lca(a, b)] << nl;
+    }
 
     return (0 ^ 0);
 

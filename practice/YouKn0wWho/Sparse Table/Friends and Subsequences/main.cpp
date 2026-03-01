@@ -86,11 +86,11 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
+struct sparse_table_min{
     int n, max_log;
     vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
+    sparse_table_min() {}
+    sparse_table_min(ll A[], int n) : n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
         FOR(i, 1, n + 1) st[0][i] = A[i];
         FOR(j, 1, max_log) {
             for(int i = 1; i + (1 << j) - 1 <= n; i++) {
@@ -105,19 +105,24 @@ struct sparse_table{
     }
 };
 
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
+struct sparse_table_max{
+    int n, max_log;
+    vector<vector<ll>> st;
+    sparse_table_max() {}
+    sparse_table_max(ll A[], int n) : n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
+        FOR(i, 1, n + 1) st[0][i] = A[i];
+        FOR(j, 1, max_log) {
+            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
+                st[j][i] = max(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+            }
+        }
     }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
+    ll query(int l, int r) {
+        if(l > r) return LLONG_MIN;
+        int j = __lg(r - l + 1);
+        return max(st[j][l], st[j][r - (1 << j) + 1]);
     }
-}
+};
 
 int main(void) {
     minhtuan0312;
@@ -128,8 +133,41 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n; cin >> n;
+    ll A[n + 1], B[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> B[i];
+    }
+    sparse_table_min st1(B, n);
+    sparse_table_max st2(A, n);
+    ll res = 0;
+    FOR(i, 1, n + 1) {
+        int l = i, r = n, upper = -1;
+        while(l <= r) {
+            int m = (l + r) >> 1;
+            if(st2.query(i, m) > st1.query(i, m)) {
+                upper = m;
+                r = m - 1;
+            } else l = m + 1;
+        }
+        if(upper == -1) upper = n + 1;
+        l = i, r = n;
+        int lower = -1;
+        while(l <= r) {
+            int m = (l + r) >> 1;
+            if(st2.query(i, m) >= st1.query(i, m)) {
+                lower = m;
+                r = m - 1;
+            } else l = m + 1;
+        }
+        if(lower == -1 || st2.query(i, lower) != st1.query(i, lower)) continue;
+        res += upper - lower;
+    }
+    cout << res;
+
 
     return (0 ^ 0);
 

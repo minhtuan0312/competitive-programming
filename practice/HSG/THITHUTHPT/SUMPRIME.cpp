@@ -86,50 +86,46 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+const int limN = 1e6 + 6;
+bitset<limN> isPrime;
+ll pre[limN];
+void init() {
+    isPrime.set();
+    pre[0] = 0;
+    isPrime[0] = isPrime[1] = 0;
+    int sq = sqrt(limN);
+    FOR(i, 2, sq) {
+        if(isPrime[i]) {
+            for(int j = i * i; j < limN; j += i) {
+                isPrime[j] = 0;
             }
         }
     }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
+    FOR(i, 1, limN) {
+        if(isPrime[i]) {
+            pre[i] = pre[i - 1] + i;
+        } else {
+            pre[i] = pre[i - 1];
+        }
     }
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "SUMPRIME"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    init();
+
+    int q; cin >> q;
+    while(q--) {
+        int a, b; cin >> a >> b;
+        cout << pre[b] - pre[a - 1] << nl;
+    }
 
     return (0 ^ 0);
 

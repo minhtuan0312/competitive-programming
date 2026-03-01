@@ -86,37 +86,18 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
 void solve() {
-    int n; cin >> n;
-    int A[n + 1];
+    string s, t; cin >> s >> t;
+    int n = sz(s);
+    s = ' ' + s, t = ' ' + t;
+    int mark[26] = {0};
     FOR(i, 1, n + 1) {
-        cin >> A[i];
+        if(s[i] != t[i]) {
+            if(!mark[t[i] - 'a']) return cout << "NO" << nl, void();
+        }
+        mark[s[i] - 'a'] = i;
     }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
+    cout << "YES" << nl;
 }
 
 int main(void) {

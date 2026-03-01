@@ -18,13 +18,15 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) return x = y, 1;
+    return 0;
 }
 
 template<class T>
-void minimize(T &x, const T &y) {
-    if (x > y) x = y;
+inline bool minimize(T &x, const T &y) {
+    if (x > y) return x = y, 1;
+    return 0;
 }
 
 template<typename T1, typename T2>
@@ -86,50 +88,57 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
+struct Point {
+    ll x, y;
+};
+ll calc(const Point &a, const Point &b) {
+    return llabs(a.x - b.x) + abs(a.y - b.y);
+}
+ll n, d;
+ll A[105];
+Point P[105];
+ll dist[105];
+bool check(ll x) {
+
+    FOR(i, 1, n + 1) dist[i] = -1;
+    dist[1] = x;
+    FOR(u, 1, n) {
+        if(dist[u] == -1) continue;
+        FOR(v, u + 1, n + 1) {
+            ll cost = calc(P[u], P[v]) * d;
+            if(dist[u] - cost >= 0) {
+                maximize(dist[v], dist[u] - cost + A[v]);
             }
         }
     }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
+    return dist[n] >= 0;
 }
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "MARIO"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    cin >> n >> d;
+    FOR(i, 2, n) {
+        cin >> A[i];
+    }
+    FOR(i, 1, n + 1) {
+        cin >> P[i].x >> P[i].y;
+    }
+    ll l = 0, r = 1e16, res = 0;
+    while(l <= r) {
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else l = m + 1;
+    }
+    cout << res;
 
     return (0 ^ 0);
 

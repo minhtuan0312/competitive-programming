@@ -86,50 +86,39 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
-    }
-};
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
+ll gcd(ll a, ll b) {
+    if(b == 0) return llabs(a); // xử lý số âm!
+    return gcd(b, a % b);
 }
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "GCD"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    int n, m; cin >> n >> m;
+    ll A[n + 1], B[m + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    FOR(j, 1, m + 1) {
+        cin >> B[j];
+    }
+    ll pre = A[2] - A[1];
+    FOR(i, 3, n + 1) {
+        pre = gcd(pre, A[i] - A[i - 1]);
+    }
+    FOR(j, 1, m + 1) {
+        if(n == 1) {
+            cout << llabs(A[1] + B[j]) << ' ';
+        } else {
+            ll res = llabs(A[1] + B[j]);
+            cout << gcd(res, pre) << ' ';
+        }
+    }
 
     return (0 ^ 0);
 

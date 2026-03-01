@@ -86,51 +86,44 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
+struct Event {
+    int x;
+    int type;
+    bool operator < (const Event &other) const {
+        return x == other.x? type > other.type: x < other.x;
     }
 };
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
-}
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "VILLAGES"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
-
+    ll n, m; cin >> n >> m;
+    vector<Event> events;
+    FOR(i, 1, n + 1) {
+        int l, r; cin >> l >> r;
+        if(l > r) {
+            events.pb({l, -1});
+            events.pb({r, 1});
+        }
+    }
+    sort(all(events));
+    ll active = 0;
+    ll prev_x = events[0].x;
+    ll res = 0;
+    for(const Event &e: events) {
+        if(active > 0) {
+            res += e.x - prev_x;
+        }
+        active += e.type;
+        prev_x = e.x;
+    }
+    cout << m + 2ll * res;
     return (0 ^ 0);
 
 }

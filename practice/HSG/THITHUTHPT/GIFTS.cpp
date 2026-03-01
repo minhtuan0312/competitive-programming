@@ -86,50 +86,50 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct sparse_table{
-    int n, max_log;
-    vector<vector<ll>> st;
-    sparse_table() {}
-    sparse_table(int A[], int n): n(n), max_log(__lg(n) + 1), st(max_log, vector<ll>(n + 1)) {
-        FOR(i, 1, n + 1) st[0][i] = A[i];
-        FOR(j, 1, max_log) {
-            for(int i = 1; i + (1 << j) - 1 <= n; i++) {
-                st[j][i] = min(st[j - 1][i], st[j - 1][i + (1 << (j - 1))]);
-            }
-        }
-    }
-    ll query(int l, int r) {
-        if(l > r) return LLONG_MAX;
-        int j = __lg(r - l + 1);
-        return min(st[j][l], st[j][r - (1 << j) + 1]);
+struct Event {
+    ll x;
+    ll type;
+    ll id;
+    bool operator < (const Event &other) const {
+        return x == other.x? type > other.type: x < other.x;
     }
 };
-
-void solve() {
-    int n; cin >> n;
-    int A[n + 1];
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-    }
-    sparse_table sparse(A, n);
-    int q; cin >> q;;
-    while(q--) {
-        int l, r; cin >> l >> r; l++, r++;
-        cout << sparse.query(l, r) << nl;
-    }
-}
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "GIFTS"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    int t; cin >> t;
-    while(t--) solve();
+    ll n, k, q; cin >> n >> k >> q;
+    vector<Event> events;
+    FOR(i, 1, k + 1) {
+        ll l, r; cin >> l >> r;
+        events.pb({l, 1, 0});
+        events.pb({r + 1, -1, 0});
+    }
+    FOR(i, 1, q + 1) {
+        ll x; cin >> x;
+        events.pb({x, -2, i});
+    }
+    sort(all(events));
+    vector<ll> res(q + 1);
+    ll cur = 0;
+    for(const auto &e: events) {
+        if(e.type == 1) {
+            cur++;
+        } else if(e.type == -1) {
+            cur--;
+        } else {
+            res[e.id] = cur;
+        }
+    }
+    FOR(i, 1, q + 1) {
+        cout << res[i] << nl;
+    }
 
     return (0 ^ 0);
 
