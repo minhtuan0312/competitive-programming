@@ -86,52 +86,61 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
+const int offset = 5000;
+const int limV = 10005;
+typedef pair<int, int> ii;
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "DOMINO"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    int n; cin >> n;
+    ii A[n + 1];
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+        cin >> A[i].fi >> A[i].se;
     }
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
+    ll dp[n + 1][10005];
+    FOR(i, 0, n + 1) {
+        FOR(j, 0, 10005) dp[i][j] = LLONG_MAX;
+    }
+
+    dp[0][offset] = 0;
+    FOR(i, 1, n + 1) {
+        int stay = A[i].fi - A[i].se;
+        int change = A[i].se - A[i].fi;
+        FOR(v, 0, limV) {
+            if(dp[i - 1][v] == LLONG_MAX) continue;
+            // stay
+            if(v + stay >= 0 && v + stay < limV) {
+                minimize(dp[i][v + stay], dp[i - 1][v]);
+            }
+            // change
+            if(v + change >= 0 && v + change < limV) {
+                minimize(dp[i][v + change], dp[i - 1][v] + 1);
             }
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
     }
-    cout << res;
+
+    ll res = LLONG_MAX;
+    ll res_rotate = LLONG_MAX;
+    FOR(v, 0, limV) {
+        if(dp[n][v] == LLONG_MAX) continue;
+        int cur = abs(v - offset);
+        if(res > cur) {
+            res = cur;
+            res_rotate = dp[n][v];
+        } else if(cur == res) {
+            minimize(res_rotate, dp[n][v]);
+        }
+    }
+    cout << res << ' ' << res_rotate;
+
 
     return (0 ^ 0);
 

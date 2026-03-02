@@ -86,50 +86,30 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "GROUPS"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    ll n, k; cin >> n >> k;
+    ll A[n + 2];
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+        cin >> A[i];
+        A[i] = abs(A[i]);
     }
-
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
+    sort(A + 1, A + 1 + n);
+    A[n + 1] = 1e9 + 5;
+    ll j = 0;
+    ll res = 0;
+    FOR(i, 1, n + 1) {
+        if(!j || A[i] - A[j] > k) {
+            res++;
+            j = i;
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
     }
     cout << res;
 

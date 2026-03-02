@@ -86,52 +86,86 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
+
+typedef pair<ll, ll> ii;
+ll n, m, C;
+const int limN = 1e6 + 5;
+int lp[limN];
+ll dist[limN];
+ii trace[limN];
+vector<int> primes;
+void init() {
+    FOR(i, 2, limN) {
+        if(!lp[i]) {
+            lp[i] = i;
+            primes.eb(i);
+        }
+        for(int j = 0; j < sz(primes) && i * primes[j] < limN; j++) {
+            lp[i * primes[j]] = primes[j];
+            if(lp[i] == primes[j]) break;
+        }
+    }
+}
+
+vector<ii> prime_factorization(ll n) {
+    vector<ii> res;
+    while(n > 1) {
+        ll p = lp[n];
+        ll e = 0;
+        while(n % p == 0) {
+            e++;
+            n /= p;
+        }
+        res.pb({p, e});
+    }
+    return res;
+}
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "BACTERIA"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
-    FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
-    }
-
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
+    memset(dist, -1, sizeof dist);
+    init();
+    cin >> n >> m >> C;
+    queue<ll> qu;
+    qu.push(n);
+    trace[n] = {-1, -1};
+    dist[n] = 0;
+    while(!qu.empty()) {
+        int u = qu.front(); qu.pop();
+        if (u == m) {
+            cout << dist[u] << nl;
+            ii last = {u, -1};
+            vector<int> res;
+            while(last.fi != -1) {
+                if(last.se != -1) res.eb(last.se);
+                last = trace[last.fi];
+            }
+            reverse(all(res));
+            for(int &v: res) cout << v << ' ';
+            return 0;
+        }
+        for(auto [p, e]: prime_factorization(u)) {
+            if(p > C) break;
+            if(dist[u / p] == -1) {
+                dist[u / p] = dist[u] + 1;
+                trace[u / p] = {u, p};
+                qu.push(u / p);
             }
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
+        if((u * u) <= C && dist[u * u] == -1) {
+            dist[u * u] = dist[u] + 1;
+            trace[u * u] = {u, 0};
+            qu.push(u * u);
+        }
     }
-    cout << res;
+    cout << "Impossible";
 
     return (0 ^ 0);
 

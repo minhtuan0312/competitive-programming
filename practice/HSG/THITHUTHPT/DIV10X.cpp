@@ -87,51 +87,53 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 struct Node{
-    ll taste, spicy;
+    ll x, c2, c5;
 };
-
+const int limN = 1e5 + 5;
+Node A[limN];
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "DIV10X"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    int n, x; cin >> n >> x;
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+        cin >> A[i].x;
+        ll tmp = A[i].x;
+        if(tmp == 0) continue;
+        while(tmp % 2 == 0) {
+            A[i].c2++;
+            tmp /= 2;
+        }
+        while(tmp % 5 == 0) {
+            A[i].c5++;
+            tmp /= 5;
+        }
     }
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
+    ll dp[x + 1][x + 1];
+    FOR(i, 0, x + 1) {
+        FOR(j, 0, x + 1) {
+            dp[i][j] = LLONG_MAX;
+        }
+    }
+    dp[0][0] = 0;
+    FOR(i, 1, n + 1) {
+        FORd(j, 0, x + 1) {
+            FORd(k, 0, x + 1) {
+                int nj = max(0ll, j - A[i].c2);
+                int nk = max(0ll, k - A[i].c5);
+                if(dp[nj][nk] == LLONG_MAX) continue;
+                minimize(dp[j][k], dp[nj][nk] + 1);
             }
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
     }
-    cout << res;
+    cout << dp[x][x];
+
 
     return (0 ^ 0);
 

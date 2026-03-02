@@ -86,50 +86,46 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "POKEMON"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    int n; cin >> n;
+    string s; cin >> s;
+    s = ' ' + s;
+
+    int m = 0;
+    map<char, int> counter;
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
-    }
-
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
+        if(!counter[s[i]]) {
+            counter[s[i]] = 1;
+            m++;
         }
-        return 0;
-    };
+    }
+    deb(m);
+    counter.clear();
 
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
+    int cnt = 0;
+    int j = 1;
+    int res = INT_MAX;
+    FOR(i, 1, n + 1) {
+        if(!counter[s[i]]) {
+            cnt++;
+        }
+        counter[s[i]]++;
+        while(j <= i && cnt == m) {
+            minimize(res, i - j + 1);
+            counter[s[j]]--;
+            if(!counter[s[j]]) {
+                cnt--;
+            }
+            j++;
+        }
     }
     cout << res;
 

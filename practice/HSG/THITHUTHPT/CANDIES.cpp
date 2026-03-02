@@ -86,52 +86,34 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    int n, q; cin >> n >> q;
+    ll A[n + 1];
+    ll pre[n + 1];
+    pre[0] = 0;
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+        cin >> A[i];
     }
-
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
-        }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
+    sort(A + 1, A + 1 + n, greater<int>());
+    FOR(i, 1, n + 1) {
+        pre[i] = pre[i - 1] + A[i];
+    }
+    while(q--) {
+        ll x; cin >> x;
+        auto it = lower_bound(pre + 1, pre + 1 + n, x);
+        if(it != pre + 1 + n) {
+            cout << it - pre << nl;
+        } else cout << -1 << nl;
 
     }
-    cout << res;
 
     return (0 ^ 0);
 

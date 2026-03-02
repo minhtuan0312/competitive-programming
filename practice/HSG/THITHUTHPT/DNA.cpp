@@ -86,52 +86,42 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "DNA"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
-    FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+    int n; cin >> n;
+    string s; cin >> s;
+    s = ' ' + s;
+
+    ll dpA[n + 1]; // số thao tác ít nhất để biến i ban đầu thành 'A'
+    ll dpB[n + 1]; // số thao tác ít nhất để biến i ban đầu thành 'B'
+    FOR(i, 0, n + 1) {
+        dpA[i] = LLONG_MAX;
+        dpB[i] = LLONG_MAX;
     }
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
+    dpA[1] = (s[1] == 'B');
+    dpB[1] = (s[1] == 'A');
+
+    FOR(i, 2, n + 1) {
+
+        if(s[i] == 'A') {
+            minimize(dpA[i], dpA[i - 1]);
+            minimize(dpB[i], min(dpB[i - 1] + 1, dpA[i - 1] + 1));
+        } else if(s[i] == 'B') {
+            minimize(dpB[i], dpB[i - 1]);
+            minimize(dpA[i], min(dpA[i - 1] + 1, dpB[i - 1] + 1));
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
 
     }
-    cout << res;
+
+    cout << min(dpA[n], dpB[n] + 1);
 
     return (0 ^ 0);
 

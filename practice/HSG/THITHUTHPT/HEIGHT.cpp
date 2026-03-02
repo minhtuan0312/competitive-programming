@@ -86,52 +86,58 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
+typedef pair<int, int> ii;
+int n, m, s, t;
+const int limN = 1e5 + 5;
+vector<ii> adj[limN];
+int visited[limN];
+ll session = 0;
+bool check(ll h) {
+    session++;
+    queue<int> qu;
+    visited[s] = session;
+    qu.push(s);
+    while(!qu.empty()) {
+        int u = qu.front(); qu.pop();
+        if(u == t) return 1;
+        for(const auto &[v, max_h]: adj[u]) {
+            if(visited[v] != session && h <= max_h) {
+                visited[v] = session;
+                qu.push(v);
+            }
+        }
+    }
+    return 0;
+}
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "HEIGHT"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
-    FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+    cin >> n >> m >> s >> t;
+    FOR(i, 1, m + 1) {
+        ll u, v, w; cin >> u >> v >> w;
+        adj[u].eb(v, w);
+        adj[v].eb(u, w);
     }
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
-        }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
+    ll l = 0, r = 1e6, res = -1;
     while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
+        ll m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            l = m + 1;
+        } else {
+            r = m - 1;
+        }
     }
     cout << res;
+
 
     return (0 ^ 0);
 

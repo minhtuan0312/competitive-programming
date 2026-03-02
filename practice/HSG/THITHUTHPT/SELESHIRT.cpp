@@ -87,51 +87,50 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 struct Node{
-    ll taste, spicy;
+    ll x; int id;
+    bool operator < (const Node &other) const {
+        return x < other.x;
+    }
 };
 
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK ""
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
+    ll n, m, x, y; cin >> n >> m >> x >> y;
+    Node A[n + 1], B[m + 1];
     FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
+        cin >> A[i].x;
+        A[i].id = i;
     }
+    FOR(i, 1, m + 1) {
+        cin >> B[i].x;
+        B[i].id = i;
+    }
+    sort(A + 1, A + 1 + n);
+    sort(B + 1, B + 1 + m);
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
-            } else {
-                cur = 0;
-            }
+    int i = 1, j = 1;
+    vector<pair<int, int>> res;
+    while(i <= n && j <= m) {
+        if(B[j].x < A[i].x - x) {
+            j++;
+        } else if (B[j].x > A[i].x + y) {
+            i++;
+        } else {
+            res.pb({A[i].id, B[j].id});
+            i++, j++;
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
     }
-    cout << res;
+    cout << sz(res) << nl;
+    for(const auto [u, v]: res) {
+        cout << u << ' ' << v << nl;
+    }
 
     return (0 ^ 0);
 

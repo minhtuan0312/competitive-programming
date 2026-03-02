@@ -86,52 +86,42 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-struct Node{
-    ll taste, spicy;
-};
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK "LUNCH"
+    #define TASK "NGOAC"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    ll n, m; cin >> n >> m;
-    Node A[n + 1];
-    ll min_spicy = LLONG_MAX;
-    ll max_spicy = LLONG_MIN;
-    FOR(i, 1, n + 1) {
-        cin >> A[i].taste >> A[i].spicy;
-        maximize(max_spicy, A[i].spicy);
-        minimize(min_spicy, A[i].spicy);
-    }
+    string s; cin >> s;
+    int n = sz(s);
+    s = ' ' + s;
 
-    auto check = [&](const ll k) -> bool {
-        ll cur = 0;
-        FOR(i, 1, n + 1) {
-            if(A[i].spicy <= k) {
-                cur += A[i].taste;
-                if(cur >= m) return 1;
+    ll dp[n + 1];
+    memset(dp, 0, sizeof dp);
+    ll res = 0, cnt = 0;
+    FOR(i, 1, n + 1) {
+        if(s[i] == ')') {
+            if(s[i - 1] == '(') {
+                dp[i] = dp[i - 2] + 2;
             } else {
-                cur = 0;
+                int j = i - dp[i - 1] - 1;
+                if(j >= 1 && s[j] == '(') {
+                    dp[i] = dp[j - 1] + dp[i - 1] + 2;
+                }
             }
         }
-        return 0;
-    };
-
-    ll l = min_spicy, r = max_spicy, res = 0;
-    while(l <= r) {
-        ll mid = (l + r) >> 1;
-        if(check(mid)) {
-            res = mid;
-            r = mid - 1;
-        } else l = mid + 1;
-
+        if(dp[i] > res) {
+            res = dp[i];
+            cnt = 1;
+        } else if (dp[i] == res) {
+            cnt++;
+        }
     }
-    cout << res;
+    if(res == 0) return cout << "0 1", 0;
+    cout << res << ' ' << cnt;
 
     return (0 ^ 0);
 
