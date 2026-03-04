@@ -89,7 +89,7 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "SIBICE"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);

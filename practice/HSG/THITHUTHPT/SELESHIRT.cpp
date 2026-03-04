@@ -96,7 +96,7 @@ struct Node{
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "SELESHIRT"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);

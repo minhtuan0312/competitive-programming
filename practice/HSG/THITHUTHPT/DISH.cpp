@@ -18,8 +18,9 @@ using namespace std;
 const ll mod = 1e9 + 7;
 
 template<class T>
-void maximize(T &x, const T &y) {
-    if (x < y) x = y;
+inline bool maximize(T &x, const T &y) {
+    if (x < y) return x = y, 1;
+    return 0;
 }
 
 template<class T>
@@ -86,88 +87,49 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
-const int limN = 1e6 + 5;
-int lp[limN];
-vector<int> primes;
-void linear_sieve() {
-    FOR(i, 2, limN) {
-        if(!lp[i]) {
-            lp[i] = i;
-            primes.pb(i);
-        }
-        int size_ = sz(primes);
-        for(int j = 0; j < size_ && i * primes[j] < limN; j++) {
-            lp[i * primes[j]] = primes[j];
-            if(i == primes[j]) break;
-        }
-    }
-}
-
-int freq[limN] = {0};
-
-vector<pair<int, int>> factorization(int n) {
-    vector<pair<int, int>> res;
-    int sq = sqrt(n);
-    for(int i = 2; i <= sq; i++) {
-        if (n % i == 0) {
-            int p = 0;
-            while(n % i == 0) {
-                p++;
-                n /= i;
-            }
-            res.eb(i, p);
-        }
-    }
-    if(n != 1) res.eb(n, 1);
-    return res;
-}
-
-vector<vector<pair<int, int>>> facts;
-
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "DISH"
     if (fopen(TASK ".inp", "r")) {
         freopen(TASK ".inp", "r", stdin);
         freopen(TASK ".out", "w", stdout);
     }
 
-    linear_sieve();
-
-    int n; cin >> n;
+    int n, p; cin >> n >> p;
     int A[n + 1];
+    ll pre[n + 1], pre_min[n + 1];
+    pre[0] = pre[0] = 0;
     FOR(i, 1, n + 1) {
         cin >> A[i];
-        facts.pb(factorization(A[i]));
+        pre[i] = pre[i - 1] + A[i];
+        pre_min[i] = min(pre_min[i - 1], pre_min[i]);
     }
-    for(const auto &x: facts) {
-        for(const auto &[p, e]: x) {
-            freq[p] += e;
+
+    int res = -1, res_r = -1, res_l = -1;
+    FOR(i, 1, n + 1) {
+        ll target = pre[i] - p;
+        int l = 0, r = i - 1, best = -1;
+        while(l <= r) {
+            int m = (l + r) >> 1;
+            if(pre[m] <= target) {
+                best = m;
+                r = m - 1;
+            } else l = m + 1;
         }
-    }
-    ll d = 1, c = 0;
-    for(const int &p: primes) {
-
-        if(!freq[p]) continue;
-
-        int require = freq[p] / n;
-        d *= pow(p, require);
-        int need = 0;
-        for(const auto &x: facts) {
-            int ie = 0;
-            for(const auto [p_, e_]: x) {
-                if(p_ != p) continue;
-                ie = e_;
-                break;
-            }
-            if(ie < require) {
-                need += require - ie;
+        if(best != -1) {
+            int len = i - (best + 1) + 1;
+            if(maximize(res, len)) {
+                res_r = i;
+                res_l = best + 1;
             }
         }
-        c += need;
     }
-    cout << d << ' ' << c;
+    if(res == -1) cout << -1;
+    else {
+        cout << res_l << ' ' << res_r;
+    }
+
 
     return (0 ^ 0);
 

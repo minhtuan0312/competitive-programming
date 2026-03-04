@@ -95,35 +95,66 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    int n, m, M; cin >> n >> m >> M;
+    int n, p; cin >> n >> p;
     int A[n + 1];
-    FOR(i, 1, n + 1) cin >> A[i];
-
-    ll leq = 0, lower = 0;
-    int l = 1;
-    ll sum = 0;
-    FOR(r, 1, n + 1) {
-        sum += A[r];
-        if(sum > M) {
-            while(sum > M) {
-                sum -= A[l++];
-            }
-        }
-        leq += (r - l + 1);
+    FOR(i, 1, n + 1){
+        cin >> A[i];
     }
 
-    l = 1;
-    sum = 0;
-    FOR(r, 1, n + 1) {
-        sum += A[r];
-        if(sum >= m) {
-            while(sum >= m) {
-                sum -= A[l++];
+    if (3 * p == n) {
+        int res = 0;
+        for (int i = 1; i <= n; i += 3) {
+            int a = A[i];
+            int b = A[i+1];
+            int c = A[i+2];
+            res = max(res, max({a, b, c}) - min({a, b, c}));
+        }
+        cout << res << endl;
+        return 0;
+    }
+
+    auto check = [&](int x) {
+        int cnt = 0;
+        int l = 1;
+        while(l <= n - 3 + 1) {
+            vector<int> cur;
+            bool ok = 0;
+            FOR(r, l, n + 1) {
+                auto it = lower_bound(all(cur), A[r]);
+                cur.insert(it, A[r]);
+                if(sz(cur) >= 3) {
+                    FOR(i, 0, sz(cur) - 3 + 1) {
+                        if(cur[i + 2] - cur[i] <= x) {
+                            ok = 1;
+                            break;
+                        }
+                    }
+                }
+                if(ok) {
+                    cnt++;
+                    l = r + 1;
+                    break;
+                }
+                if(r == n) l = n + 1;
+            }
+            if(cnt >= p) {
+                return 1;
             }
         }
-        lower += (r - l + 1);
+        return 0;
+
+    };
+
+    int l = 0, r = 2e9, res = -1;
+    while(l <= r) {
+
+        int m = (l + r) >> 1;
+        if(check(m)) {
+            res = m;
+            r = m - 1;
+        } else l = m + 1;
     }
-    cout << leq - lower;
+    cout << res;
 
     return (0 ^ 0);
 

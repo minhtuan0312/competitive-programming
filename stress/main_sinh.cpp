@@ -86,29 +86,21 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+mt19937_64 rng(chrono::steady_clock::now().time_since_epoch().count());
+ll randInt(ll l, ll r) {
+    uniform_int_distribution dist(l, r);
+    return dist(rng);
+}
+
 int main(void) {
     minhtuan0312;
 
-    #define TASK ""
+    #define TASK "main"
     if (fopen(TASK ".inp", "r")) {
-        freopen(TASK ".inp", "r", stdin);
-        freopen(TASK ".out", "w", stdout);
+        freopen(TASK ".inp", "w", stdout);
     }
 
-    string s, t; cin >> s >> t;
-    int n = sz(s), m = sz(t);
-    s = ' ' + s;
-    t = ' ' + t;
-
-    int res = 0;
-    FOR(i, 1, m + 1) {
-        bool ok = 1;
-        FOR(j, 1, n + 1) {
-            if(s[j] != t[i + (j - 1)]) ok = 0;
-        }
-        if(ok) res++;
-    }
-    cout << res;
+    cout << randInt(1, 1000) << ' ' << randInt(1, 1000);
 
     return (0 ^ 0);
 
