@@ -87,24 +87,19 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #endif
 
 void solve() {
-
     ll n; cin >> n;
-
     ll start = 1;
     ll len = 1;
     ll cnt = 9;
-
     while(n > len * cnt) {
         n -= len * cnt;
         len++;
         cnt *= 10;
         start *= 10;
     }
-
     ll target = start + (n - 1) / len;
     string s = to_string(target);
     cout << s[(n - 1) % len] << nl;
-
 }
 
 int main(void) {
