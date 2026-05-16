@@ -86,9 +86,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 #define deb(...)
 #endif
 
+/* ----------------------------- END OF TEMPLATE ---------------------------- */
 
 // * ví dụ 1: liệt kê dãy số
-// cho hai số n và k, liệt kê theo thứ tự từ điển tăng dần các dãy số độ dài n, với các số có giá trị từ 1 đến k
+// ? cho hai số n và k, liệt kê theo thứ tự từ điển tăng dần các dãy số độ dài n, với các số có giá trị từ 1 đến k
 
 // - dãy có thứ tự từ điển nhỏ nhất là dãy n số 1
 // - cách tìm dãy liền sau của a[1] a[2] ... a[n]
@@ -177,20 +178,19 @@ namespace vidu2 {
 }
 
 // *quy luật chung
-
 // Bước 1. tìm đoạn mà ở đó mọi vị trí đều chọn phương án lớn nhất có thể. Gọi i là vị trí phải nhất còn có thể lớn hơn
 // Bước 2. tăng vị trí i tìm được ở bước 1 thêm 1 nấc (giá trị lớn hơn tiếp theo)
 // Bước 3. đưa mỗi vị trí từ i + 1 -> n, chọn giá trị nhỏ nhất có thể cho nó
 // + trong trường hợp không tìm được vị trí i ở bước 1, ta đã ở dãy có thứ tự từ điển lớn nhất
-
 // độ phức tạp cho việc tìm dãy tiếp theo tối đa có thể là O(n), thực tế nó tuyến tính với độ dài phần bị biến đổi
 
-// ******************************************* HỆ QUẢ QUAN TRỌNG
-// ** nếu trường hợp tìm hoán vị tiếp theo thứ tự từ điển, khi gọi 1 lần hàm next, độ phức tạp có thể là O(n)
-// Nhưng nếu gọi 1e6 lần next liên tiếp, tổng đpt chỉ ~ O(n + 1e6) chứ không phải O(n * 1e6)
+// !/* ---------------------------- HỆ QUẢ QUAN TRỌNG --------------------------- */
+// * nếu trường hợp tìm hoán vị tiếp theo thứ tự từ điển, khi gọi 1 lần hàm next, độ phức tạp có thể là O(n)
+// * Nhưng nếu gọi 1e6 lần next liên tiếp, tổng đpt chỉ ~ O(n + 1e6) chứ không phải O(n * 1e6)
+// !/
 
 // * ví dụ 3: liệt kê dãy ngoặc đúng
-// cho số n, liệt kê các dãy ngoặc đúng theo thứ tự từ điển tăng dần
+// ? cho số n, liệt kê các dãy ngoặc đúng theo thứ tự từ điển tăng dần
 
 // - định nghĩa dãy ngoặc đúng
 // + mỗi kí tự trong xâu đều là mở ngoặc (hoặc đóng ngoặc)
@@ -214,4 +214,4 @@ int main(void) {
 
 }
 
-// thou art fair
+/* ------------------------------ thou art fair ----------------------------- */
