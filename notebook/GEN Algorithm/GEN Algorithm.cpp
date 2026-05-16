@@ -88,7 +88,7 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
-// * ví dụ 1: liệt kê dãy số
+//* ------------------------- ví dụ 1: liệt kê dãy số ------------------------ */
 // ? cho hai số n và k, liệt kê theo thứ tự từ điển tăng dần các dãy số độ dài n, với các số có giá trị từ 1 đến k
 
 // - dãy có thứ tự từ điển nhỏ nhất là dãy n số 1
@@ -126,8 +126,7 @@ namespace vidu1 {
     }
 }
 
-// * ví dụ 2: liệt kê hoán vị
-
+//* ------------------------ ví dụ 2: liệt kê hoán vị ------------------------ */
 // 1. tìm hậu tố giảm dần dài nhất. Nói cách khác duyệt i từ n về 1, tìm vị trí đầu tiên sau cho a[i] < a[i + 1] (vị trí đầu tiên không giảm dần)
 // -> a[i + 1] > a[i + 2] > a[i + 3]... > a[n] là hậu tố giảm dần dài nhất
 
@@ -177,7 +176,7 @@ namespace vidu2 {
 
 }
 
-// *quy luật chung
+// ?quy luật chung
 // Bước 1. tìm đoạn mà ở đó mọi vị trí đều chọn phương án lớn nhất có thể. Gọi i là vị trí phải nhất còn có thể lớn hơn
 // Bước 2. tăng vị trí i tìm được ở bước 1 thêm 1 nấc (giá trị lớn hơn tiếp theo)
 // Bước 3. đưa mỗi vị trí từ i + 1 -> n, chọn giá trị nhỏ nhất có thể cho nó
@@ -185,11 +184,11 @@ namespace vidu2 {
 // độ phức tạp cho việc tìm dãy tiếp theo tối đa có thể là O(n), thực tế nó tuyến tính với độ dài phần bị biến đổi
 
 // !/* ---------------------------- HỆ QUẢ QUAN TRỌNG --------------------------- */
-// * nếu trường hợp tìm hoán vị tiếp theo thứ tự từ điển, khi gọi 1 lần hàm next, độ phức tạp có thể là O(n)
-// * Nhưng nếu gọi 1e6 lần next liên tiếp, tổng đpt chỉ ~ O(n + 1e6) chứ không phải O(n * 1e6)
+// nếu trường hợp tìm hoán vị tiếp theo thứ tự từ điển, khi gọi 1 lần hàm next, độ phức tạp có thể là O(n)
+// Nhưng nếu gọi 1e6 lần next liên tiếp, tổng đpt chỉ ~ O(n + 1e6) chứ không phải O(n * 1e6)
 // !/
 
-// * ví dụ 3: liệt kê dãy ngoặc đúng
+//* --------------------- ví dụ 3: liệt kê dãy ngoặc đúng -------------------- */
 // ? cho số n, liệt kê các dãy ngoặc đúng theo thứ tự từ điển tăng dần
 
 // - định nghĩa dãy ngoặc đúng
@@ -197,7 +196,47 @@ namespace vidu2 {
 // + số ký tự mở ngoặc bằng số ký tự đóng ngoặc (bằng n / 2)
 // + trong một tiền tố bất kỳ, số ký tự mở ngoặc không ít hơn số ký tự đóng ngoặc
 // + số lượng dãy ngoặc đúng độ dày n: số catalan
+// + đóng ngoặc ')' có thứ tự từ điển lớn hơn '('
 
+
+// - việc tìm dãy ngoặc có thứ tự từ điển tiếp theo vẫn dựa trên mô hình 3 bước của thuật toán GEN
+// - chú ý, với mỗi vị trí i, gọi: 
+//      + deg[i] = [số mở ngoặc - số ngoặc đóng] ở các vị trí 1 -> i - 1
+//      + open[i] = [số mở ngoặc] ở các vị trí 1 -> i - 1
+// - với mọi dãy ngoặc đúng bất kỳ, ta luôn có deg[n + 1] = 0 và open[n + 1] = n / 2
+// ! vị trí i có thể là mở ngoặc nếu open[i] < n / 2
+// ! vị trí i có thể là đóng ngoặc nếu deg[i] > 0
+
+namespace vidu3 {
+    bool getNext(string &s, int n) {
+        
+        int deg = 0, open = n / 2;
+        for(int i = n; i >= 1; i--) {
+            deg -= s[i] == '('? 1: -1;
+            open -= s[i] == '(';
+            bool canOpen = open < n / 2;
+            bool canClose = deg > 0;
+            if(s[i] == '(') assert(canOpen); else assert(canClose);
+            bool canGreater = s[i] == '(' && canClose;
+            if(canGreater) {
+                s[i] = ')';
+                int p = i + 1;
+                for(int j = 0; j < n / 2 - open; j++) s[p++] = '(';
+                for(int j = p; j <= n; j++) s[j] = '    )';
+                return 1;
+            }
+        }
+        return 0;
+    }
+    void solve() {
+        int n; cin >> n;
+        string s = string(n / 2, '(') + string(n / 2, ')');
+        s = ' ' + s;
+        do {
+            cout << s.c_str() + 1 << nl;
+        } while (getNext(s, n));
+    }
+}
 
 int main(void) {
     minhtuan0312;
@@ -208,10 +247,10 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
 
-    vidu2::solve();
+    vidu3::solve();
 
     return (0 ^ 0);
 
 }
 
-/* ------------------------------ thou art fair ----------------------------- */
+/* ------------------------------ THOU ART FAIR ----------------------------- */
