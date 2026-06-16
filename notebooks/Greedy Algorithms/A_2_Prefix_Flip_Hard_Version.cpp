@@ -88,6 +88,35 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
+vector<int> convert_to_all_zeros(string s, int n) {
+    vector<int> res;
+    s = s + '0';
+    FOR(i, 1, n + 1) {
+        if(s[i] != s[i + 1]) {
+            res.pb(i);
+        }
+    }
+    return res;
+}
+
+void solve() {
+    int n; cin >> n;
+    string s, t; cin >> s >> t;
+    s = ' ' + s;
+    t = ' ' + t;
+    vector<int> ans1 = convert_to_all_zeros(s, n);
+    vector<int> ans2 = convert_to_all_zeros(t, n);
+    cout << sz(ans1) + sz(ans2) << ' ';
+    for(const int &it: ans1) {
+        cout << it << ' ';
+    }
+    reverse(all(ans2));
+    for(const int &it: ans2) {
+        cout << it << ' ';
+    }
+    cout << nl;
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -97,26 +126,11 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
     
-    int n; cin >> n;
-    int A[n + 1];
-    priority_queue<int, vector<int>, greater<int>> min_heap;
-    ll cur = 0;
-    int res = 0;
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-        cur += A[i];
-        res++;
-        if(A[i] < 0) min_heap.push(A[i]);
-        if(cur < 0) {
-            while(cur < 0) {
-                int u = min_heap.top(); min_heap.pop();
-                cur -= u;
-                res--;
-            }
-        }
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-    cout << res;
-
+    
     return (0 ^ 0);
 
 }

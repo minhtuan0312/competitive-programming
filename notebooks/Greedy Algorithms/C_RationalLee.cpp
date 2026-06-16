@@ -88,6 +88,39 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
+// make good friends more happy
+// give garbage to greedy friends
+
+
+void solve() {
+
+    int n, k; cin >> n >> k;
+    int A[n + 1], w[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
+    }
+    sort(A + 1, A + 1 + n);
+    int i = 1, j = n;
+    ll res = 0;
+    priority_queue<int> max_heap;
+    FOR(i, 1, k + 1) {
+        cin >> w[i];
+        if(w[i] == 1) {
+            res += A[j] + A[j];
+            j--;
+        } else max_heap.push(w[i]);
+    }
+    while(!max_heap.empty()) {
+        int u = max_heap.top(); max_heap.pop();
+        res += A[i];
+        i+= (u - 2 + 1);
+        res += A[j];
+        j--;
+    }
+    cout << res << nl;
+
+}
+
 int main(void) {
     minhtuan0312;
 
@@ -97,26 +130,11 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
     
-    int n; cin >> n;
-    int A[n + 1];
-    priority_queue<int, vector<int>, greater<int>> min_heap;
-    ll cur = 0;
-    int res = 0;
-    FOR(i, 1, n + 1) {
-        cin >> A[i];
-        cur += A[i];
-        res++;
-        if(A[i] < 0) min_heap.push(A[i]);
-        if(cur < 0) {
-            while(cur < 0) {
-                int u = min_heap.top(); min_heap.pop();
-                cur -= u;
-                res--;
-            }
-        }
+    int t; cin >> t;
+    while(t--) {
+        solve();
     }
-    cout << res;
-
+    
     return (0 ^ 0);
 
 }

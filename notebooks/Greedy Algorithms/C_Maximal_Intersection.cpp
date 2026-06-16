@@ -88,6 +88,9 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
+// intersection = (max(l1, l2, ...), min(r1, r2, ...))
+// length = R - L
+
 int main(void) {
     minhtuan0312;
 
@@ -98,25 +101,35 @@ int main(void) {
     }
     
     int n; cin >> n;
-    int A[n + 1];
-    priority_queue<int, vector<int>, greater<int>> min_heap;
-    ll cur = 0;
+    int preL[n + 1], preR[n + 1], sufL[n + 2], sufR[n + 2];
+    // pre: intersection from 1 to i
+    // suf: intersection from i to n
+    pair<int, int> p[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> p[i].fi >> p[i].se;
+    }
+    preL[0] = INT_MIN;
+    preR[0] = INT_MAX;
+    FOR(i, 1, n + 1) {
+        preL[i] = max(preL[i - 1], p[i].fi);
+        preR[i] = min(preR[i - 1], p[i].se);
+    }
+
+    sufL[n + 1] = INT_MIN;
+    sufR[n + 1] = INT_MAX;
+    for(int i = n; i >= 1; i--) {
+        sufL[i] = max(sufL[i + 1], p[i].fi);
+        sufR[i] = min(sufR[i + 1], p[i].se);
+    }
+
     int res = 0;
     FOR(i, 1, n + 1) {
-        cin >> A[i];
-        cur += A[i];
-        res++;
-        if(A[i] < 0) min_heap.push(A[i]);
-        if(cur < 0) {
-            while(cur < 0) {
-                int u = min_heap.top(); min_heap.pop();
-                cur -= u;
-                res--;
-            }
-        }
+        int L = max(preL[i - 1], sufL[i + 1]);
+        int R = min(preR[i - 1], sufR[i + 1]);
+        maximize(res, R - L);
     }
     cout << res;
-
+    
     return (0 ^ 0);
 
 }

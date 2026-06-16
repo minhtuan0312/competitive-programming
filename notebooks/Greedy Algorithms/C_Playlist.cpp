@@ -97,26 +97,29 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
     
-    int n; cin >> n;
-    int A[n + 1];
-    priority_queue<int, vector<int>, greater<int>> min_heap;
-    ll cur = 0;
-    int res = 0;
+    ll n, k; cin >> n >> k;
+    pair<ll, ll> A[n + 1];
     FOR(i, 1, n + 1) {
-        cin >> A[i];
-        cur += A[i];
-        res++;
-        if(A[i] < 0) min_heap.push(A[i]);
-        if(cur < 0) {
-            while(cur < 0) {
-                int u = min_heap.top(); min_heap.pop();
-                cur -= u;
-                res--;
-            }
+        cin >> A[i].fi >> A[i].se;
+    }
+    sort(A + 1, A + 1 + n, [&](pair<ll, ll> &x, pair<ll, ll> &y){
+        return x.se > y.se;
+    });
+
+    priority_queue<ll, vector<ll>, greater<ll>> min_heap;
+    ll cur = 0, cur_min = LLONG_MAX, res = 0;
+    FOR(i, 1, n + 1) {
+        cur += A[i].first;
+        minimize(cur_min, A[i].se);
+        min_heap.push(A[i].fi);
+        if(sz(min_heap) > k) {
+            cur -= min_heap.top(); min_heap.pop();
         }
+        maximize(res, cur * cur_min); // chắc chắn <= k
     }
     cout << res;
 
+    
     return (0 ^ 0);
 
 }

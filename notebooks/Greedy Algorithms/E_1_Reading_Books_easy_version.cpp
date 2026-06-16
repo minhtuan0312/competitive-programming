@@ -88,6 +88,10 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
+struct st {
+    int t, a, b;
+};
+
 int main(void) {
     minhtuan0312;
 
@@ -97,26 +101,42 @@ int main(void) {
         freopen(TASK ".out", "w", stdout);
     }
     
-    int n; cin >> n;
-    int A[n + 1];
-    priority_queue<int, vector<int>, greater<int>> min_heap;
-    ll cur = 0;
-    int res = 0;
+    int n, k; cin >> n >> k;
+    st A[n + 1];
+    vector<int> alice, bob, both;
+    int idx = 0, jdx = 0, kdx = 0;
     FOR(i, 1, n + 1) {
-        cin >> A[i];
-        cur += A[i];
-        res++;
-        if(A[i] < 0) min_heap.push(A[i]);
-        if(cur < 0) {
-            while(cur < 0) {
-                int u = min_heap.top(); min_heap.pop();
-                cur -= u;
-                res--;
+        cin >> A[i].t >> A[i].a >> A[i].b;
+        if(A[i].a && A[i].b) both.pb(A[i].t);
+        else if(A[i].a) alice.pb(A[i].t);
+        else if(A[i].b) bob.pb(A[i].t);
+    }
+    sort(all(alice));
+    sort(all(bob));
+    sort(all(both));
+    int res = 0;
+    while(k--) {
+        int cost1 = INT_MAX;
+        if(kdx < sz(both)) {
+            cost1 = both[kdx];
+        }
+        int cost2 = INT_MAX;
+        if(idx < sz(alice) && jdx < sz(bob)) {
+            cost2 = alice[idx] + bob[jdx];
+        }
+        if(cost1 == INT_MAX && cost2 == INT_MAX) return cout << -1, 0;
+        else {
+            if(cost1 <= cost2) {
+                res += cost1;
+                kdx++;
+            } else {
+                res += cost2;
+                idx++, jdx++;
             }
         }
     }
     cout << res;
-
+    
     return (0 ^ 0);
 
 }
