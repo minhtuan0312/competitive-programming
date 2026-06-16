@@ -88,32 +88,34 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
-vector<int> convert_to_all_zeros(string &s, int n) {
-    vector<int> res;
-    s += '0';
-    FOR(i, 1, n + 1) {
-        if(s[i] != s[i + 1]) {
-            res.pb(i);
-        }
-    }
-    return res;
-}
-
 void solve() {
+
     int n; cin >> n;
-    string s, t; cin >> s >> t;
-    s = ' ' + s;
-    t = ' ' + t;
-    vector<int> ans1 = convert_to_all_zeros(s, n);
-    vector<int> ans2 = convert_to_all_zeros(t, n);
-    cout << sz(ans1) + sz(ans2) << ' ';
-    for(const int &it: ans1) {
-        cout << it << ' ';
+    string s; cin >> s;
+
+    vector<int> tmp(n);
+    iota(all(tmp), 1);
+    reverse(all(tmp)); // >>>>> -> find <
+    for(int i = 0; i < n - 1;) {
+        if(s[i] == '<') {
+            int j = i;
+            while(j < n - 1 && s[j] == '<') j++;
+            reverse(tmp.begin() + i, tmp.begin() + j + 1);
+            i = j;
+        } else i++;
     }
-    reverse(all(ans2));
-    for(const int &it: ans2) {
-        cout << it << ' ';
+    for(const int &x: tmp) cout << x << ' ';
+    cout << nl;
+    sort(all(tmp)); // <<<<< -> find >
+    for(int i = 0; i < n - 1;) {
+        if(s[i] == '>') {
+            int j = i;
+            while(j < n - 1 && s[j] == '>') j++;
+            reverse(tmp.begin() + i, tmp.begin() + j + 1);
+            i = j;
+        } else i++;
     }
+    for(const int &x: tmp) cout << x << ' ';
     cout << nl;
 }
 

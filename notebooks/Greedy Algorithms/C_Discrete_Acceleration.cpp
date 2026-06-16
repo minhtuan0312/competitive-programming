@@ -88,33 +88,41 @@ void _print(T t, V... v) {__print(t); if(sizeof...(v)) cerr << ", "; _print(v...
 
 /* ----------------------------- END OF TEMPLATE ---------------------------- */
 
-vector<int> convert_to_all_zeros(string &s, int n) {
-    vector<int> res;
-    s += '0';
-    FOR(i, 1, n + 1) {
-        if(s[i] != s[i + 1]) {
-            res.pb(i);
-        }
-    }
-    return res;
-}
-
 void solve() {
-    int n; cin >> n;
-    string s, t; cin >> s >> t;
-    s = ' ' + s;
-    t = ' ' + t;
-    vector<int> ans1 = convert_to_all_zeros(s, n);
-    vector<int> ans2 = convert_to_all_zeros(t, n);
-    cout << sz(ans1) + sz(ans2) << ' ';
-    for(const int &it: ans1) {
-        cout << it << ' ';
+
+    int n, l; cin >> n >> l;
+    int A[n + 1];
+    FOR(i, 1, n + 1) {
+        cin >> A[i];
     }
-    reverse(all(ans2));
-    for(const int &it: ans2) {
-        cout << it << ' ';
+    double x1 = 0, x2 = l;
+    double v1 = 1, v2 = 1;
+    int le = 1, ri = n;
+    double res = 0;
+    while(le <= ri) {
+        
+        double est1 = (A[le] - x1) / (v1);
+        double est2 = (x2 - A[ri]) / (v2);
+        if(est1 < est2) {
+            res += est1;
+            x1 = A[le];
+            x2 -= v2 * est1;
+            v1++;
+            le++;
+        } else {
+            res += est2;
+            x2 = A[ri];
+            x1 += v1 * est2;
+            v2++;
+            ri--;
+        }
+
     }
-    cout << nl;
+
+    double dx = x2 - x1;
+    res += dx/(v1 + v2);
+    cout << fixed << setprecision(15) << res << nl;
+
 }
 
 int main(void) {
