@@ -46,7 +46,7 @@ Trong VS Code: **Ctrl+Alt+N** (Code Runner) = `cprun`. Extension **CPH** + tiệ
    rồi tự code lại không nhìn. Bài nào học được kỹ thuật mới → chép phần cốt lõi vào `shared/` (thư viện riêng).
 7. `git add -A && git commit -m "cf 2051A"` sau mỗi buổi - lịch sử luyện tập chính là nhật ký tiến bộ.
 
-## Lộ trình gợi ý cho ICPC
+## Lộ trình gợi ý
 
 - **CSES Problem Set** làm hết theo chủ đề (nền tảng chuẩn), song song **Codeforces** contest Div 2/3 đều đặn (thi live, không bỏ).
 - Luyện **virtual contest** đề ICPC cũ (Vietnam National/Regional, Asia) theo đội 3 người, **1 máy**, 5 giờ -
