@@ -1,4 +1,4 @@
-# ~/code/cp — workspace luyện CP / ICPC
+# ~/code/cp - workspace luyện CP / ICPC
 
 ```
 cp/
@@ -46,12 +46,12 @@ trên Chrome: bấm nút xanh trên trang đề là test mẫu tự vào VS Code
    đúng chế độ multi-test · bỏ `dbg` không ảnh hưởng (đã tự tắt khi không có `-DLOCAL`).
 6. **Upsolve**: sau contest giải tiếp mọi bài ≤ (bài cuối làm được + 1). Đọc editorial chỉ sau ≥ 30–45 phút bí,
    rồi tự code lại không nhìn. Bài nào học được kỹ thuật mới → chép phần cốt lõi vào `shared/` (thư viện riêng).
-7. `git add -A && git commit -m "cf 2051A"` sau mỗi buổi — lịch sử luyện tập chính là nhật ký tiến bộ.
+7. `git add -A && git commit -m "cf 2051A"` sau mỗi buổi - lịch sử luyện tập chính là nhật ký tiến bộ.
 
 ## Lộ trình gợi ý cho ICPC
 
 - **CSES Problem Set** làm hết theo chủ đề (nền tảng chuẩn), song song **Codeforces** contest Div 2/3 đều đặn (thi live, không bỏ).
-- Luyện **virtual contest** đề ICPC cũ (Vietnam National/Regional, Asia) theo đội 3 người, **1 máy**, 5 giờ —
+- Luyện **virtual contest** đề ICPC cũ (Vietnam National/Regional, Asia) theo đội 3 người, **1 máy**, 5 giờ -
   ICPC chỉ có 1 bàn phím nên phải luyện chia việc, đọc đề song song, code trên giấy khi máy bận.
 - Tự xây **team notebook ≤ 25 trang** (dựa trên KACTL, chỉ giữ thứ đội hiểu và đã dùng). Mọi đoạn trong notebook phải được test qua bài thật.
 - Luyện gõ không cần internet/AI: đi thi không có autocomplete thông minh, nên thỉnh thoảng code bằng nvim/không extension.
