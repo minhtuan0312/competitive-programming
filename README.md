@@ -1,4 +1,4 @@
-# ~/code/cp - workspace luyện CP / ICPC
+# ~/code/cp
 
 ```
 cp/
@@ -31,10 +31,8 @@ cp/
 | `stress [N]` | so `main.cpp` với `brute.cpp` trên test từ `gen.cpp <seed>`; sai thì lưu `fail.in` |
 
 Trong VS Code: **Ctrl+Alt+N** (Code Runner) = `cprun`. Extension **CPH** + tiện ích
-[Competitive Companion](https://chromewebstore.google.com/detail/competitive-companion/cjnmckjndlpiamhfimnnjmnckgghkjbl)
-trên Chrome: bấm nút xanh trên trang đề là test mẫu tự vào VS Code.
 
-## Quy trình mỗi bài (thói quen của người làm lâu năm)
+## Quy trình mỗi bài
 
 1. **Đọc kỹ đề + ràng buộc trước khi code.** Từ `n` suy ra độ phức tạp:
    n ≤ 20 → 2ⁿ · n ≤ 500 → n³ · n ≤ 5000 → n² · n ≤ 2·10⁵ → n log n · n ≤ 10⁷ → O(n).
