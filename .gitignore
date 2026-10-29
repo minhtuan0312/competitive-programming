@@ -1,10 +1,18 @@
-# Bỏ file build
+# build output (cprun/stress put binaries in .bin/)
+.bin/
 *.exe
-*.out
+*.o
 *.obj
+a.out
 *.log
 *.tmp
+~$*
 
-# Folder test
+# scratch I/O
 input.txt
 output.txt
+fail.in
+fail.out
+
+# vendored reference, not our code
+icpc/notebook/kactl/
