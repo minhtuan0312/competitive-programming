@@ -11,7 +11,7 @@ cp/
 │   ├── regionals/      đề ICPC cũ, luyện theo đội (cpnew icpc ...)
 │   └── notebook/kactl  team notebook KACTL để tham khảo/in
 └── shared/
-    ├── templates/      main.cpp (multi-test, cho CF) · single.cpp (các OJ khác)
+    ├── templates/      main.cpp (multi-test) · single.cpp (không còn tự chép; template chính là snippet `tem` của VS Code)
     ├── debug.h         dbg(x, v, mp) -> stderr, chỉ bật khi -DLOCAL
     └── algorithms/ data-structures/ snippets/   thư viện CỦA BẠN
 ```
@@ -20,9 +20,10 @@ cp/
 
 | Lệnh | Việc |
 |---|---|
-| `cpnew cf 2051A` | tạo `codeforces/2051A/main.cpp` từ template, cd vào, mở VS Code tại dòng cần code |
+| `cpnew cf 2051A` | tạo `codeforces/2051A/main.cpp` rỗng, cd vào, mở VS Code; gõ `tem` + Tab để bung template |
 | `cpnew cses 1068 Weird Algorithm` | → `cses/1068-Weird-Algorithm/` (tự bỏ dấu, dấu cách → `-`) |
-| `cfnew`, `csesnew`, `marisanew`, `lqnew`, `icpcnew` | viết tắt của `cpnew <nền tảng>` |
+| `cfnew`, `csesnew`, `lqnew`, `icpcnew` | viết tắt của `cpnew <nền tảng>` |
+| `marisanew level0 "Input / Output and Condition" "Hello Marisa!"` | → `marisaoj/level0/input-output-and-condition/hello-marisa/` (mỗi tham số là một cấp thư mục, viết thường) |
 | `cpcontest cf 2051 G` | tạo `codeforces/2051/{A..G}/main.cpp`, mở cả contest |
 | `cpc`, `cf`, `cpg cses` | cd nhanh |
 | `cprun` | biên dịch (-O2, có PCH nên ~0.5s) + chạy mọi `*.in`, so với `*.out`/`*.ans` → AC/WA/TLE/RE |

@@ -16,3 +16,7 @@ fail.out
 
 # vendored reference, not our code
 icpc/notebook/kactl/
+
+# handwritten drafts live in ~/notes/cp (heavy, never pushed)
+*.xopp
+*.autosave.xopp
