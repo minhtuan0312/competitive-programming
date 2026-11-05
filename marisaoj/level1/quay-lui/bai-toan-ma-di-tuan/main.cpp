@@ -124,6 +124,9 @@ void solve(int i, int j) {
     }
 }
 
+// thuật toán warnsdorff: 
+// luôn ưu tiên nhảy đến ô tiếp theo có ít lựa chọn đi tiếp nhất
+
 int main(void) {
     minhtuan0312;
 
